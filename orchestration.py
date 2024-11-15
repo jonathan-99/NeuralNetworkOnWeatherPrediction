@@ -33,8 +33,7 @@ def setup(parameter=None):
     """
     print(f"Running setup with parameter: {parameter}")
 
-    directory_to_scan = '.'  # The directory to scan for Python files
-    utils.generate_requirements_txt(directory_to_scan)  # Generate requirements.txt
+    utils.setup()
     install_requirements_from_file()  # Install dependencies from requirements.txt
 
 
