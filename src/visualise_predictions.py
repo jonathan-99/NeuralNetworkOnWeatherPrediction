@@ -1,8 +1,6 @@
-# visualize_predictions.py
-
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
+import joblib  # For loading the saved model
 
 
 def plot_predictions(model, X_test, y_test, timestamps=None):
@@ -10,7 +8,7 @@ def plot_predictions(model, X_test, y_test, timestamps=None):
     Plot the actual vs. predicted values for the test data.
 
     Args:
-        model (tf.keras.Model): Trained neural network model for prediction.
+        model: Trained machine learning model for prediction (e.g., from scikit-learn).
         X_test (np.array): Test feature data.
         y_test (np.array): True target values for the test data.
         timestamps (list, optional): List of timestamps for the x-axis.
@@ -36,7 +34,7 @@ def plot_predictions(model, X_test, y_test, timestamps=None):
 
 if __name__ == "__main__":
     # Load the trained model (ensure the path is correct)
-    model = tf.keras.models.load_model('model_checkpoints/best_model.h5')
+    model = joblib.load('model_checkpoints/best_model.pkl')  # Changed from Keras to joblib
 
     # Simulated test data (replace with actual preprocessed test data)
     input_shape = (10, 1)  # Adjust to match your data shape

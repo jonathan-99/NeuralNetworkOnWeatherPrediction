@@ -1,13 +1,7 @@
-"""
-Description: Evaluates the trained model on the test set to measure performance metrics such as mean squared error (MSE) or root mean squared error (RMSE). Includes visualization of predictions vs. actual data.
-"""
-
-# model_evaluator.py
-
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-import tensorflow as tf
+import joblib  # For loading models saved with joblib or sklearn
 
 
 class ModelEvaluator:
@@ -16,7 +10,7 @@ class ModelEvaluator:
         Initialize the ModelEvaluator with the trained model.
 
         Args:
-            model (tf.keras.Model): The trained neural network model.
+            model: The trained model (e.g., an sklearn model).
         """
         self.model = model
 
@@ -31,11 +25,15 @@ class ModelEvaluator:
         Returns:
             dict: Dictionary containing evaluation metrics (MSE, RMSE, MAE).
         """
+        # Make predictions
         predictions = self.model.predict(X_test)
+
+        # Calculate metrics
         mse = mean_squared_error(y_test, predictions)
         rmse = np.sqrt(mse)
         mae = mean_absolute_error(y_test, predictions)
 
+        # Print the evaluation results
         print(f"Mean Squared Error (MSE): {mse:.4f}")
         print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
         print(f"Mean Absolute Error (MAE): {mae:.4f}")
@@ -55,6 +53,7 @@ class ModelEvaluator:
             predictions (np.array): Model-predicted values for the test data.
             timestamps (list, optional): List of timestamps for the x-axis.
         """
+        # Plot the results
         plt.figure(figsize=(14, 6))
         if timestamps is None:
             timestamps = np.arange(len(y_test))  # Use indices if timestamps aren't provided
@@ -72,7 +71,6 @@ class ModelEvaluator:
 
 # Example usage
 if __name__ == "__main__":
-    from model_trainer import ModelTrainer
     import numpy as np
 
     # Simulated test data (replace with actual test data)
@@ -80,8 +78,8 @@ if __name__ == "__main__":
     X_test = np.random.rand(20, *input_shape)
     y_test = np.random.rand(20, 1)
 
-    # Load the trained model
-    model = tf.keras.models.load_model('model_checkpoints/best_model.h5')
+    # Load the trained model using joblib (assuming the model was saved as a .pkl file)
+    model = joblib.load('model_checkpoints/best_model.pkl')  # Adjust if your model is in a different format
 
     # Evaluate the model
     evaluator = ModelEvaluator(model)

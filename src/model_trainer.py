@@ -1,20 +1,16 @@
-"""
-Description: Handles the training process of the neural network, including running the training loop, validating the model at each epoch, and saving the best model based on performance.
-"""
-# model_trainer.py
-
 import os
-import tensorflow as tf
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+import joblib
+from sklearn.ensemble import RandomForestRegressor  # Example model
+from sklearn.metrics import mean_squared_error
 
 
 class ModelTrainer:
     def __init__(self, model, output_dir='model_checkpoints'):
         """
-        Initialize the ModelTrainer with the neural network model and output directory.
+        Initialize the ModelTrainer with the model and output directory.
 
         Args:
-            model (tf.keras.Model): The compiled neural network model to be trained.
+            model: The machine learning model (e.g., from sklearn).
             output_dir (str): Directory where the best model checkpoint will be saved.
         """
         self.model = model
@@ -24,9 +20,9 @@ class ModelTrainer:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-        self.checkpoint_path = os.path.join(self.output_dir, 'best_model.h5')
+        self.checkpoint_path = os.path.join(self.output_dir, 'best_model.pkl')
 
-    def train(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
+    def train(self, X_train, y_train, X_val, y_val, epochs=50):
         """
         Train the model with training and validation data.
 
@@ -35,45 +31,37 @@ class ModelTrainer:
             y_train (np.array): Training target data.
             X_val (np.array): Validation feature data.
             y_val (np.array): Validation target data.
-            epochs (int): Number of epochs for training.
-            batch_size (int): Size of the training batches.
+            epochs (int): Number of epochs for training. Not used in this case, as scikit-learn models don't have epochs.
 
         Returns:
-            history (tf.keras.callbacks.History): History object with training metrics.
+            history (dict): Dictionary containing training metrics (e.g., MSE).
         """
-        # Callbacks for saving the best model and early stopping
-        checkpoint = ModelCheckpoint(
-            filepath=self.checkpoint_path,
-            monitor='val_loss',
-            save_best_only=True,
-            mode='min',
-            verbose=1
-        )
-        early_stopping = EarlyStopping(
-            monitor='val_loss',
-            patience=10,
-            mode='min',
-            verbose=1
-        )
+        best_mse = float('inf')
 
-        # Run the training process
-        history = self.model.fit(
-            X_train, y_train,
-            validation_data=(X_val, y_val),
-            epochs=epochs,
-            batch_size=batch_size,
-            callbacks=[checkpoint, early_stopping],
-            verbose=2
-        )
-        print(f"Training complete. Best model saved at {self.checkpoint_path}")
-        return history
+        # Train the model using the entire training data
+        self.model.fit(X_train, y_train)
+
+        # Evaluate on validation data
+        val_predictions = self.model.predict(X_val)
+        val_mse = mean_squared_error(y_val, val_predictions)
+
+        # Save the model if it's the best performing one
+        if val_mse < best_mse:
+            best_mse = val_mse
+            joblib.dump(self.model, self.checkpoint_path)
+            print(f"Best model saved with MSE: {best_mse:.4f} at {self.checkpoint_path}")
+
+        return {
+            'val_mse': val_mse,
+            'best_mse': best_mse
+        }
 
     def load_best_model(self):
         """
         Load the best model saved during training.
         """
         if os.path.exists(self.checkpoint_path):
-            self.model = tf.keras.models.load_model(self.checkpoint_path)
+            self.model = joblib.load(self.checkpoint_path)
             print(f"Best model loaded from {self.checkpoint_path}")
         else:
             print("Best model file not found.")
@@ -81,7 +69,6 @@ class ModelTrainer:
 
 # Example usage
 if __name__ == "__main__":
-    from model_definition import NeuralNetworkModel
     import numpy as np
 
     # Simulated training and validation data (replace with actual preprocessed data)
@@ -91,12 +78,12 @@ if __name__ == "__main__":
     X_val = np.random.rand(20, *input_shape)
     y_val = np.random.rand(20, 1)
 
-    # Initialize and compile the model
-    model = NeuralNetworkModel(input_shape=input_shape).model
+    # Initialize a machine learning model (e.g., RandomForestRegressor from scikit-learn)
+    model = RandomForestRegressor(n_estimators=100)
 
     # Train the model
     trainer = ModelTrainer(model)
-    history = trainer.train(X_train, y_train, X_val, y_val, epochs=50, batch_size=32)
+    history = trainer.train(X_train, y_train, X_val, y_val, epochs=50)
 
     # Load the best model for evaluation or prediction
     trainer.load_best_model()
