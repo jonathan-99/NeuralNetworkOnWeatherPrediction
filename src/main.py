@@ -1,12 +1,12 @@
 # main.py
 
-from data_loader import WindSpeedData
-from data_preprocessor import DataPreprocessor
-from data_visualizer import DataVisualizer
-from model_builder import NeuralNetworkModel
-from model_trainer import ModelTrainer
-from model_evaluator import ModelEvaluator
-from visualise_predictions import plot_predictions
+from src.data_loader import WindSpeedData
+from src.data_preprocessor import DataPreprocessor
+from src.data_visualizer import DataVisualizer
+from src.model_builder import NeuralNetworkModel
+from src.model_trainer import ModelTrainer
+from src.model_evaluator import ModelEvaluator
+from src.visualise_predictions import plot_predictions
 #from hyperparameter_tuner import tune_hyperparameters
 
 
