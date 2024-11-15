@@ -1,88 +1,69 @@
-"""
-common utility
-"""
+# orchestration.py
 
-# utils.py
-
+import src.utils as utils
+import src.main as train_and_test
+import subprocess
+import sys
 import os
-import ast
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def extract_imports_from_file(file_path):
+def install_requirements_from_file(requirements_file='requirements.txt'):
     """
-    Extract the import libraries from a Python file.
+    Installs all packages listed in the specified requirements.txt file using pip.
 
     Args:
-        file_path (str): Path to the Python file to scan.
-
-    Returns:
-        set: A set of unique libraries imported in the file.
+        requirements_file (str): The path to the requirements.txt file (default is 'requirements.txt').
     """
-    imports = set()
+    try:
+        logging.info(f"Installing packages from {requirements_file}...")
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', requirements_file])
+        logging.info("Packages installed successfully.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error installing packages: {e}")
+        sys.exit(1)
 
-    with open(file_path, 'r') as file:
-        # Parse the Python file to get the abstract syntax tree (AST)
-        tree = ast.parse(file.read())
-
-        # Extract import statements
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                for alias in node.names:
-                    imports.add(alias.name)
-            elif isinstance(node, ast.ImportFrom):
-                imports.add(node.module)
-
-    return imports
-
-
-def get_all_python_files(directory):
+def setup(parameter=None):
     """
-    Get a list of all Python files in the given directory and subdirectories.
+    Perform setup operations: generate requirements.txt and install dependencies.
 
     Args:
-        directory (str): Directory to search for Python files.
-
-    Returns:
-        list: List of Python file paths.
+        parameter (str): Optional parameter to be passed to setup functions.
     """
-    python_files = []
+    logging.info(f"Running setup with parameter: {parameter}")
 
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith('.py'):
-                python_files.append(os.path.join(root, file))
+    directory_to_scan = '.'  # The directory to scan for Python files
+    logging.info(f"Scanning directory {directory_to_scan} for Python files...")
 
-    return python_files
+    # Generate the requirements.txt file using utils
+    utils.generate_requirements_txt(directory_to_scan)
 
+    # Verify if the requirements.txt file is created
+    if os.path.exists('requirements.txt'):
+        logging.info("requirements.txt file created successfully.")
+    else:
+        logging.warning("requirements.txt file was not created.")
 
-def generate_requirements_txt(directory, output_file='requirements.txt'):
+    # Install dependencies from the generated requirements.txt
+    install_requirements_from_file()
+
+def of_we_go(parameter=None):
     """
-    Generate a requirements.txt file with all import libraries from Python files in the given directory.
+    Starts the neural network training process.
 
     Args:
-        directory (str): Directory to scan for Python files.
-        output_file (str): Name of the output requirements file (default: 'requirements.txt').
+        parameter (str): Optional parameter to control aspects of training.
     """
-    all_imports = set()
+    logging.info(f"Running neural network training with parameter: {parameter}")
+    train_and_test.main()  # Execute the main training process
 
-    # Get all Python files in the directory and subdirectories
-    python_files = get_all_python_files(directory)
-
-    # Extract imports from each file
-    for python_file in python_files:
-        imports = extract_imports_from_file(python_file)
-        all_imports.update(imports)
-
-    # Write the requirements.txt file
-    with open(output_file, 'w') as req_file:
-        for imp in sorted(all_imports):
-            req_file.write(f"{imp}\n")
-
-    print(f"Requirements have been written to {output_file}")
-
-
-# Example usage
 if __name__ == "__main__":
-    # Set the directory to scan (e.g., current directory or specific folder)
-    directory_to_scan = '.'
-    generate_requirements_txt(directory_to_scan)
+    if len(sys.argv) < 2:
+        logging.error("Error: Missing parameter string. Please provide a parameter.")
+        sys.exit(1)
+
+    param_string = sys.argv[1]  # Get the first parameter from the command line argument
+    setup(param_string)  # Step 1: Setup - Generate requirements.txt and install packages
+    of_we_go(param_string)  # Step 2: Run the training process
