@@ -1,6 +1,6 @@
 # orchestration.py
 
-import src.utils as utils
+import src.capture_requirements as cap_req
 import src.main as train_and_test
 import subprocess
 import sys
@@ -38,7 +38,7 @@ def setup(parameter=None):
     logging.info(f"Scanning directory {directory_to_scan} for Python files...")
 
     # Generate the requirements.txt file using utils
-    utils.generate_requirements_txt(directory_to_scan)
+    cap_req.generate_requirements_txt(directory_to_scan)
 
     # Verify if the requirements.txt file is created
     if os.path.exists('requirements.txt'):
