@@ -7,22 +7,6 @@ import sys
 import os
 
 
-def install_requirements_from_file(requirements_file='requirements.txt'):
-    """
-    Installs all packages listed in the specified requirements.txt file using pip.
-
-    Args:
-        requirements_file (str): The path to the requirements.txt file (default is 'requirements.txt').
-    """
-    try:
-        print(f"Installing packages from {requirements_file}...")
-        # Run pip install command to install all the packages listed in the requirements file
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', requirements_file])
-        print("Packages installed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing packages: {e}")
-        sys.exit(1)
-
 
 def setup(parameter=None):
     """
@@ -34,7 +18,6 @@ def setup(parameter=None):
     print(f"Running setup with parameter: {parameter}")
 
     utils.setup()
-    install_requirements_from_file()  # Install dependencies from requirements.txt
 
 
 def of_we_go(parameter=None):
