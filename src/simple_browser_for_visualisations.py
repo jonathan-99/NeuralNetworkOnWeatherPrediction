@@ -4,6 +4,10 @@ import os
 import time
 from flask import Flask, render_template_string, send_file
 import matplotlib.pyplot as plt
+import logging
+
+# Set up logging to file or console
+logging.basicConfig(level=logging.DEBUG)
 
 # Create an app instance
 app = Flask(__name__)
@@ -71,10 +75,16 @@ def index():
 # Route to display a specific visualization
 @app.route('/view/<filename>')
 def view_file(filename):
-    filepath = os.path.join(OUTPUT_DIR, filename)
-    if not os.path.exists(filepath):
-        return "File not found."
-    return send_file(filepath, mimetype='text/html')
+    try:
+        filepath = os.path.join(OUTPUT_DIR, filename)
+        if not os.path.exists(filepath):
+            logging.error(f"File not found: {filepath}")
+            return "File not found."
+        return send_file(filepath, mimetype='image/png')
+    except Exception as e:
+        logging.error(f"Error serving file {filename}: {e}")
+        return "An error occurred while serving the file."
+
 
 
 # Main function to generate visualizations
