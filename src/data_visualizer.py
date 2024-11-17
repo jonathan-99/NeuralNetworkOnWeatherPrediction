@@ -1,18 +1,13 @@
-"""
-Description: Generates plots and graphs to visualize the raw data, preprocessed data, and model predictions. This script can help provide insights into data trends and model behavior.
-"""
-
-# data_visualizer.py
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import os
 
 sns.set(style="whitegrid")
 
 
 class DataVisualizer:
-    def __init__(self, timestamps, raw_data, preprocessed_data=None, model_predictions=None):
+    def __init__(self, timestamps, raw_data, preprocessed_data=None, model_predictions=None, output_dir="visualizations"):
         """
         Initialize the DataVisualizer with raw data, preprocessed data, and model predictions.
 
@@ -21,38 +16,65 @@ class DataVisualizer:
             raw_data (list): List of original wind speed data points.
             preprocessed_data (list, optional): List of scaled/normalized wind speed data points.
             model_predictions (list, optional): List of model-predicted wind speed data points.
+            output_dir (str): Directory to save the visualizations.
         """
         self.timestamps = timestamps
         self.raw_data = raw_data
         self.preprocessed_data = preprocessed_data
         self.model_predictions = model_predictions
+        self.output_dir = output_dir
 
-    def plot_raw_data(self):
-        """Plot the raw wind speed data."""
+        # Ensure the output directory exists
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+    def save_plot(self, filename):
+        """Save the current plot as a PNG file."""
+        plt.savefig(filename, format='png')
+        plt.close()
+
+    def create_visualization(self, data, label, color):
+        """Creates and saves a plot of the data."""
         plt.figure(figsize=(14, 6))
-        plt.plot(self.timestamps, self.raw_data, label='Raw Data', color='blue')
+        plt.plot(self.timestamps, data, label=label, color=color)
         plt.xlabel('Timestamp')
         plt.ylabel('Wind Speed (m/s)')
-        plt.title('Raw Wind Speed Data')
+        plt.title(f'{label} Wind Speed Data')
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.legend()
-        plt.show()
+
+        # Save the plot as a PNG file
+        filename = os.path.join(self.output_dir, f'{label.replace(" ", "_")}_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+        self.save_plot(filename)
+        return filename  # Return the file name to be used in the HTML
+
+    def generate_html(self, images, output_file="visualization_page.html"):
+        """Generates an HTML page to display the saved images."""
+        html_content = "<html><head><title>Wind Speed Visualizations</title></head><body>"
+
+        # Add each image to the HTML file
+        for image in images:
+            html_content += f'<img src="{image}" alt="{image}" style="max-width: 100%; margin-bottom: 20px;"><br>'
+
+        html_content += "</body></html>"
+
+        # Save the HTML content to a file
+        with open(output_file, 'w') as f:
+            f.write(html_content)
+
+        print(f"HTML file saved as {output_file}")
+
+    def plot_raw_data(self):
+        """Plot the raw wind speed data."""
+        return self.create_visualization(self.raw_data, 'Raw Data', 'blue')
 
     def plot_preprocessed_data(self):
         """Plot the preprocessed wind speed data."""
         if self.preprocessed_data is None:
             print("No preprocessed data available to plot.")
             return
-        plt.figure(figsize=(14, 6))
-        plt.plot(self.timestamps, self.preprocessed_data, label='Preprocessed Data', color='green')
-        plt.xlabel('Timestamp')
-        plt.ylabel('Scaled Wind Speed')
-        plt.title('Preprocessed Wind Speed Data')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.legend()
-        plt.show()
+        return self.create_visualization(self.preprocessed_data, 'Preprocessed Data', 'green')
 
     def plot_predictions(self):
         """Plot the model predictions against the original data."""
@@ -68,7 +90,11 @@ class DataVisualizer:
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.legend()
-        plt.show()
+
+        # Save the plot as a PNG file
+        filename = os.path.join(self.output_dir, f'Model_Predictions_vs_Raw_Data_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+        self.save_plot(filename)
+        return filename
 
     def plot_all(self):
         """Plot raw data, preprocessed data, and model predictions together."""
@@ -87,7 +113,11 @@ class DataVisualizer:
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.legend()
-        plt.show()
+
+        # Save the plot as a PNG file
+        filename = os.path.join(self.output_dir, f'Comparison_of_Raw_Preprocessed_and_Predicted_Data_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+        self.save_plot(filename)
+        return filename
 
 
 # Example usage
@@ -107,7 +137,13 @@ if __name__ == "__main__":
 
     # Visualize data
     visualizer = DataVisualizer(timestamps, raw_data, preprocessed_data, model_predictions)
-    visualizer.plot_raw_data()
-    visualizer.plot_preprocessed_data()
-    visualizer.plot_predictions()
-    visualizer.plot_all()
+
+    # Create and save visualizations
+    images = []
+    images.append(visualizer.plot_raw_data())
+    images.append(visualizer.plot_preprocessed_data())
+    images.append(visualizer.plot_predictions())
+    images.append(visualizer.plot_all())
+
+    # Generate an HTML page with the visualizations
+    visualizer.generate_html(images)

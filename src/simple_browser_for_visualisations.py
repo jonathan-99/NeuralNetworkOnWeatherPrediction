@@ -17,21 +17,37 @@ generated_files = []
 
 
 # Function to create a visualization and save it as HTML
-def create_visualization(timestamps, data, label, color='blue'):
+def create_visualization(timestamps, data, label, color, output_dir="visualizations"):
+    """
+    Creates and saves a plot of the data.
+
+    Args:
+        timestamps (list): The timestamps for the x-axis.
+        data (list): The data to plot.
+        label (str): The label for the data.
+        color (str): The color of the plot line.
+        output_dir (str): Directory to save the visualizations.
+    """
+    # Ensure the output directory exists
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Plot the data
     plt.figure(figsize=(14, 6))
     plt.plot(timestamps, data, label=label, color=color)
     plt.xlabel('Timestamp')
     plt.ylabel('Wind Speed (m/s)')
-    plt.title(f'{label} Visualization')
+    plt.title(f'{label} Wind Speed Data')
     plt.xticks(rotation=45)
     plt.tight_layout()
+    plt.legend()
 
-    # Save as an HTML file with a timestamp
-    filename = f'{OUTPUT_DIR}/{label.replace(" ", "_").lower()}_{int(time.time())}.html'
-    plt.savefig(filename, format='html')
-    generated_files.append(filename)
+    # Save the plot as a PNG file with a timestamped name
+    filename = os.path.join(output_dir, f'{label.replace(" ", "_")}_{timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+    plt.savefig(filename)
     plt.close()
-    return filename
+
+    return filename  # Return the file name to be used in the HTML
 
 
 # Route to display available visualizations
