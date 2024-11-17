@@ -1,7 +1,8 @@
-# data_loader.py
-
+import logging
 from datetime import datetime
 
+# Configure logging for the module
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class WindSpeedData:
     def __init__(self, file_paths):
@@ -30,34 +31,67 @@ class WindSpeedData:
 
         try:
             for file_path in self.file_paths:
-                with open(file_path, 'r') as file:
-                    for line in file:
-                        try:
-                            # Split the line by comma
-                            timestamp_str, wind_speed_str = line.strip().split(',')
-                            # Parse the timestamp and wind speed
-                            timestamp = datetime.strptime(timestamp_str, '%Y %m %d %H')
-                            wind_speed = float(wind_speed_str)
+                self._process_file(file_path, timestamps, wind_speeds, seen_timestamps)
 
-                            # Check for duplicate empty rows (timestamps with 0.0)
-                            if timestamp in seen_timestamps and wind_speed == 0.0:
-                                print(f"Ignoring duplicate empty row for {timestamp}")
-                                continue
+            if not timestamps or not wind_speeds:
+                logging.error("Loaded data is empty. Please check the file contents.")
+            else:
+                logging.info(f"Data loaded successfully from {len(self.file_paths)} file(s).")
 
-                            # Append parsed data to lists
-                            timestamps.append(timestamp)
-                            wind_speeds.append(wind_speed)
-                            seen_timestamps.add(timestamp)
-
-                        except ValueError:
-                            print(f"Skipping invalid data: {line.strip()}")
-            print(f"Data loaded successfully from {len(self.file_paths)} file(s).")
         except FileNotFoundError:
-            print(f"Error: One or more files were not found.")
+            logging.error(f"Error: One or more files were not found: {self.file_paths}")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An unexpected error occurred while reading files: {e}")
 
         return timestamps, wind_speeds
+
+    def _process_file(self, file_path, timestamps, wind_speeds, seen_timestamps):
+        """
+        Processes a single file to extract and validate wind speed data.
+
+        Args:
+            file_path (str): The path of the file to read.
+            timestamps (list): The list to append timestamps.
+            wind_speeds (list): The list to append wind speed data.
+            seen_timestamps (set): The set to track unique timestamps.
+        """
+        logging.info(f"Reading data from {file_path}...")
+        try:
+            with open(file_path, 'r') as file:
+                for line in file:
+                    self._process_line(line, timestamps, wind_speeds, seen_timestamps)
+        except Exception as e:
+            logging.error(f"Error processing file {file_path}: {e}")
+
+    def _process_line(self, line, timestamps, wind_speeds, seen_timestamps):
+        """
+        Processes a single line of data, extracting and validating the timestamp and wind speed.
+
+        Args:
+            line (str): The line of text to process.
+            timestamps (list): The list to append timestamps.
+            wind_speeds (list): The list to append wind speed data.
+            seen_timestamps (set): The set to track unique timestamps.
+        """
+        try:
+            # Split the line by comma
+            timestamp_str, wind_speed_str = line.strip().split(',')
+            # Parse the timestamp and wind speed
+            timestamp = datetime.strptime(timestamp_str, '%Y %m %d %H')
+            wind_speed = float(wind_speed_str)
+
+            # Check for duplicate empty rows (timestamps with 0.0)
+            if timestamp in seen_timestamps and wind_speed == 0.0:
+                logging.warning(f"Ignoring duplicate empty row for {timestamp}")
+                return
+
+            # Append parsed data to lists
+            timestamps.append(timestamp)
+            wind_speeds.append(wind_speed)
+            seen_timestamps.add(timestamp)
+
+        except ValueError as ve:
+            logging.error(f"Skipping invalid data: {line.strip()} - {ve}")
 
     def get_data(self):
         """
@@ -75,4 +109,4 @@ if __name__ == "__main__":
     wind_data = WindSpeedData(['/train_data/2024-02-05.txt'])
     timestamps, wind_speeds = wind_data.get_data()
     for ts, ws in zip(timestamps, wind_speeds):
-        print(f"{ts}: {ws} m/s")
+        logging.info(f"{ts}: {ws} m/s")
