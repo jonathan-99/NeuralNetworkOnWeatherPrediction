@@ -35,7 +35,9 @@ def main():
 
         # Step 3: Visualize the preprocessed data (optional)
         logging.info("Visualizing data...")
-        DataVisualizer(train_data)
+        visualizer = DataVisualizer(timestamps, wind_speeds, preprocessed_data=scaled_data)
+        visualizer.plot_raw_data()
+        visualizer.plot_preprocessed_data()
 
         # Step 4: Build the model
         logging.info("Building model...")
