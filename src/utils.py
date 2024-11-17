@@ -10,6 +10,7 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 def install_requirements_from_file(requirements_file='requirements.txt'):
     """
     Installs all packages listed in the specified requirements.txt file using pip.
@@ -24,6 +25,7 @@ def install_requirements_from_file(requirements_file='requirements.txt'):
     except subprocess.CalledProcessError as e:
         logging.error(f"Error installing packages: {e}")
         sys.exit(1)
+
 
 def setup(parameter=None):
     """
@@ -42,12 +44,12 @@ def setup(parameter=None):
 
     # Verify if the requirements.txt file is created
     if os.path.exists('requirements.txt'):
-        logging.info("requirements.txt file created successfully.")
+        logging.info("requirements.txt file found.")
+        # Install dependencies from the generated requirements.txt
+        install_requirements_from_file()
     else:
         logging.warning("requirements.txt file was not created.")
 
-    # Install dependencies from the generated requirements.txt
-    install_requirements_from_file()
 
 def of_we_go(parameter=None):
     """
@@ -58,6 +60,7 @@ def of_we_go(parameter=None):
     """
     logging.info(f"Running neural network training with parameter: {parameter}")
     train_and_test.main()  # Execute the main training process
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

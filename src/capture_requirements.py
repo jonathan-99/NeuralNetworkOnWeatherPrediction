@@ -50,6 +50,3 @@ def generate_requirements_txt(directory):
 
     print("requirements.txt generated successfully.")
 
-
-# Example usage
-generate_requirements_txt('/path/to/your/project')
