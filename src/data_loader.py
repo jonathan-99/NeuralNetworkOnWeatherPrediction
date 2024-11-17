@@ -76,8 +76,8 @@ class WindSpeedData:
             seen_timestamps (set): The set to track unique timestamps.
         """
         try:
-            # Split the line by comma
-            parts = line.strip().split(',')
+            # Split the line by comma and remove empty trailing parts
+            parts = [x.strip() for x in line.strip().split(',') if x.strip()]
 
             # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
             if len(parts) != 2:
