@@ -75,7 +75,14 @@ class WindSpeedData:
         """
         try:
             # Split the line by comma
-            timestamp_str, wind_speed_str = line.strip().split(',')
+            parts = line.strip().split(',')
+
+            # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
+            if len(parts) != 2:
+                logging.error(f"Skipping invalid data (wrong number of values): {line.strip()}")
+                return
+
+            timestamp_str, wind_speed_str = parts
             # Parse the timestamp and wind speed
             timestamp = datetime.strptime(timestamp_str, '%Y %m %d %H')
             wind_speed = float(wind_speed_str)
