@@ -4,6 +4,7 @@ from datetime import datetime
 # Configure logging for the module
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class WindSpeedData:
     def __init__(self, file_paths):
         """
@@ -74,8 +75,8 @@ class WindSpeedData:
             seen_timestamps (set): The set to track unique timestamps.
         """
         try:
-            # Split the line by comma
-            parts = line.strip().split(',')
+            # Split the line by comma, and remove any extra spaces
+            parts = [x.strip() for x in line.strip().split(',')]
 
             # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
             if len(parts) != 2:
@@ -84,8 +85,12 @@ class WindSpeedData:
 
             timestamp_str, wind_speed_str = parts
             # Parse the timestamp and wind speed
-            timestamp = datetime.strptime(timestamp_str, '%Y %m %d %H')
-            wind_speed = float(wind_speed_str)
+            try:
+                timestamp = datetime.strptime(timestamp_str, '%Y %m %d %H')
+                wind_speed = float(wind_speed_str)
+            except ValueError:
+                logging.error(f"Skipping invalid data due to value error: {line.strip()}")
+                return
 
             # Check for duplicate empty rows (timestamps with 0.0)
             if timestamp in seen_timestamps and wind_speed == 0.0:
@@ -97,8 +102,8 @@ class WindSpeedData:
             wind_speeds.append(wind_speed)
             seen_timestamps.add(timestamp)
 
-        except ValueError as ve:
-            logging.error(f"Skipping invalid data: {line.strip()} - {ve}")
+        except Exception as e:
+            logging.error(f"Skipping invalid data: {line.strip()} - {e}")
 
     def get_data(self):
         """
@@ -115,5 +120,10 @@ if __name__ == "__main__":
     # Replace 'path/to/wind_speed_data.txt' with actual paths or an array of file paths
     wind_data = WindSpeedData(['/train_data/2024-02-05.txt'])
     timestamps, wind_speeds = wind_data.get_data()
-    for ts, ws in zip(timestamps, wind_speeds):
-        logging.info(f"{ts}: {ws} m/s")
+
+    # Display loaded data
+    if timestamps and wind_speeds:
+        for ts, ws in zip(timestamps, wind_speeds):
+            logging.info(f"{ts}: {ws} m/s")
+    else:
+        logging.error("No valid data loaded.")
