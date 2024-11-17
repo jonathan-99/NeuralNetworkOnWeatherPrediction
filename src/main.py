@@ -1,5 +1,3 @@
-# main.py
-
 from src.data_loader import WindSpeedData
 from src.data_preprocessor import DataPreprocessor
 from src.data_visualizer import DataVisualizer
@@ -7,17 +5,18 @@ from src.model_builder import NeuralNetworkModel
 from src.model_trainer import ModelTrainer
 from src.model_evaluator import ModelEvaluator
 from src.visualise_predictions import plot_predictions
-#from hyperparameter_tuner import tune_hyperparameters
-
+# from hyperparameter_tuner import tune_hyperparameters
 
 def main():
     # Step 1: Load the data
     print("Loading data...")
-    raw_data = WindSpeedData('train_data/2024-02-05.txt, train_data/2024-02-06.txt')
+    wind_data = WindSpeedData('train_data/2024-02-05.txt, train_data/2024-02-06.txt')
+    timestamps, wind_speeds = wind_data.get_data()  # Ensure this method returns timestamps and wind speeds
 
     # Step 2: Preprocess the data
     print("Preprocessing data...")
-    train_data, val_data, test_data = DataPreprocessor(raw_data)
+    preprocessor = DataPreprocessor(timestamps, wind_speeds)
+    train_data, val_data, test_data = preprocessor.split_data()
 
     # Step 3: Visualize the preprocessed data (optional)
     print("Visualizing data...")
@@ -46,7 +45,6 @@ def main():
     plot_predictions(model, test_data)
 
     print("Pipeline completed successfully.")
-
 
 if __name__ == "__main__":
     main()
