@@ -47,6 +47,9 @@ def create_visualization(timestamps, data, label, color, output_dir="visualizati
     plt.savefig(filename)
     plt.close()
 
+    # Add the filename to the list of generated files for Flask to pick up
+    generated_files.append(filename)  # Add this line
+
     return filename  # Return the file name to be used in the HTML
 
 

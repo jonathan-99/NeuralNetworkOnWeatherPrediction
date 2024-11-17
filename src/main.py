@@ -45,7 +45,8 @@ def main():
 
         # Step 5: Train the model
         logging.info("Training model...")
-        history = ModelTrainer(model, train_data, val_data)
+        trainer = ModelTrainer(model)  # Initialize ModelTrainer with just the model
+        history = trainer.train(train_data, val_data)  # Pass train and validation data to the train method
 
         # Step 6: Evaluate the model
         logging.info("Evaluating model...")
