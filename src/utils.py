@@ -1,5 +1,3 @@
-# orchestration.py
-
 import src.capture_requirements as cap_req
 import src.main as train_and_test
 import subprocess
@@ -11,25 +9,55 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+def is_package_installed(package_name):
+    """
+    Check if a package is installed using dpkg.
+
+    Args:
+        package_name (str): The name of the package to check.
+
+    Returns:
+        bool: True if the package is installed, False otherwise.
+    """
+    try:
+        subprocess.run(['dpkg', '-s', package_name], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 def install_requirements_from_file(requirements_file='requirements.txt'):
     """
-    Installs all packages listed in the specified requirements.txt file using pip.
+    Installs all packages listed in the specified requirements.txt file using apt-get if not already installed.
 
     Args:
         requirements_file (str): The path to the requirements.txt file (default is 'requirements.txt').
     """
     try:
-        logging.info(f"Installing packages from {requirements_file}...")
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', requirements_file])
-        logging.info("Packages installed successfully.")
+        with open(requirements_file, 'r') as file:
+            packages = file.readlines()
+
+        for package in packages:
+            package = package.strip()
+            # Map Python package names to apt-get equivalents if needed
+            apt_package = f"python3-{package}"  # This is an example; adjust based on your environment
+            if not is_package_installed(apt_package):
+                logging.info(f"Package {apt_package} is not installed. Installing...")
+                subprocess.check_call(['sudo', 'apt-get', 'install', '-y', apt_package])
+            else:
+                logging.info(f"Package {apt_package} is already installed.")
+
+        logging.info("Package installation process completed.")
+    except FileNotFoundError:
+        logging.error(f"{requirements_file} not found.")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Error installing packages: {e}")
+        logging.error(f"Error installing package {package}: {e}")
         sys.exit(1)
 
 
 def setup(parameter=None):
     """
-    Perform setup operations: generate requirements.txt and install dependencies.
+    Perform setup operations: generate requirements.txt and check/install dependencies.
 
     Args:
         parameter (str): Optional parameter to be passed to setup functions.
@@ -68,5 +96,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     param_string = sys.argv[1]  # Get the first parameter from the command line argument
-    setup(param_string)  # Step 1: Setup - Generate requirements.txt and install packages
+    setup(param_string)  # Step 1: Setup - Generate requirements.txt and check/install packages
     of_we_go(param_string)  # Step 2: Run the training process
