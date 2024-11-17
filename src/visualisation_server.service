@@ -1,0 +1,13 @@
+[Unit]
+Description=Visualization Server Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/NeuralNetworkOnWeatherPrediction/src/visualization_server.py
+WorkingDirectory=/home/pi/NeuralNetworkOnWeatherPrediction
+User=root
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

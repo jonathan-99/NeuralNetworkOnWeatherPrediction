@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 import os
+import logging
+import numpy as np
+
+# Setup logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 sns.set(style="whitegrid")
 
 
 class DataVisualizer:
-    def __init__(self, timestamps, raw_data, preprocessed_data=None, model_predictions=None, output_dir="visualizations"):
+    def __init__(self, timestamps, raw_data, preprocessed_data=None, model_predictions=None,
+                 output_dir="visualizations"):
         """
         Initialize the DataVisualizer with raw data, preprocessed data, and model predictions.
 
@@ -25,13 +30,25 @@ class DataVisualizer:
         self.output_dir = output_dir
 
         # Ensure the output directory exists
+        logging.info(f"Checking if output directory {self.output_dir} exists.")
         if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+            try:
+                os.makedirs(self.output_dir)
+                logging.info(f"Created output directory: {self.output_dir}")
+            except Exception as e:
+                logging.error(f"Failed to create directory {self.output_dir}: {str(e)}")
+                raise
 
     def save_plot(self, filename):
         """Save the current plot as a PNG file."""
-        plt.savefig(filename, format='png')
-        plt.close()
+        try:
+            logging.info(f"Saving plot to {filename}")
+            plt.savefig(filename, format='png')
+            plt.close()
+            logging.info(f"Plot saved successfully to {filename}")
+        except Exception as e:
+            logging.error(f"Failed to save plot to {filename}: {str(e)}")
+            raise
 
     def create_visualization(self, data, label, color):
         """Creates and saves a plot of the data."""
@@ -45,25 +62,31 @@ class DataVisualizer:
         plt.legend()
 
         # Save the plot as a PNG file
-        filename = os.path.join(self.output_dir, f'{label.replace(" ", "_")}_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+        filename = os.path.join(self.output_dir,
+                                f'{label.replace(" ", "_")}_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
         self.save_plot(filename)
         return filename  # Return the file name to be used in the HTML
 
     def generate_html(self, images, output_file="visualization_page.html"):
         """Generates an HTML page to display the saved images."""
-        html_content = "<html><head><title>Wind Speed Visualizations</title></head><body>"
+        try:
+            logging.info(f"Generating HTML file {output_file} to display visualizations.")
+            html_content = "<html><head><title>Wind Speed Visualizations</title></head><body>"
 
-        # Add each image to the HTML file
-        for image in images:
-            html_content += f'<img src="{image}" alt="{image}" style="max-width: 100%; margin-bottom: 20px;"><br>'
+            # Add each image to the HTML file
+            for image in images:
+                html_content += f'<img src="{image}" alt="{image}" style="max-width: 100%; margin-bottom: 20px;"><br>'
 
-        html_content += "</body></html>"
+            html_content += "</body></html>"
 
-        # Save the HTML content to a file
-        with open(output_file, 'w') as f:
-            f.write(html_content)
+            # Save the HTML content to a file
+            with open(output_file, 'w') as f:
+                f.write(html_content)
 
-        print(f"HTML file saved as {output_file}")
+            logging.info(f"HTML file saved as {output_file}")
+        except Exception as e:
+            logging.error(f"Failed to generate HTML file {output_file}: {str(e)}")
+            raise
 
     def plot_raw_data(self):
         """Plot the raw wind speed data."""
@@ -72,14 +95,14 @@ class DataVisualizer:
     def plot_preprocessed_data(self):
         """Plot the preprocessed wind speed data."""
         if self.preprocessed_data is None:
-            print("No preprocessed data available to plot.")
+            logging.warning("No preprocessed data available to plot.")
             return
         return self.create_visualization(self.preprocessed_data, 'Preprocessed Data', 'green')
 
     def plot_predictions(self):
         """Plot the model predictions against the original data."""
         if self.model_predictions is None:
-            print("No model predictions available to plot.")
+            logging.warning("No model predictions available to plot.")
             return
         plt.figure(figsize=(14, 6))
         plt.plot(self.timestamps, self.raw_data, label='Raw Data', color='blue', alpha=0.5)
@@ -92,7 +115,8 @@ class DataVisualizer:
         plt.legend()
 
         # Save the plot as a PNG file
-        filename = os.path.join(self.output_dir, f'Model_Predictions_vs_Raw_Data_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+        filename = os.path.join(self.output_dir,
+                                f'Model_Predictions_vs_Raw_Data_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
         self.save_plot(filename)
         return filename
 
@@ -115,7 +139,8 @@ class DataVisualizer:
         plt.legend()
 
         # Save the plot as a PNG file
-        filename = os.path.join(self.output_dir, f'Comparison_of_Raw_Preprocessed_and_Predicted_Data_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
+        filename = os.path.join(self.output_dir,
+                                f'Comparison_of_Raw_Preprocessed_and_Predicted_Data_{self.timestamps[0].strftime("%Y-%m-%d_%H-%M-%S")}.png')
         self.save_plot(filename)
         return filename
 
