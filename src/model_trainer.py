@@ -49,6 +49,11 @@ class ModelTrainer:
         history = {}
 
         try:
+            # Verify that the training features are non-empty
+            if X_train.shape[1] == 0:
+                logging.error("Training data has no features. Check the preprocessing step.")
+                raise ValueError("Training data has no features.")
+
             # Train the model using the training data
             self.model.fit(X_train, y_train)
             logging.info("Model training completed successfully.")

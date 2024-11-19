@@ -20,6 +20,8 @@ class DataPreprocessor:
         self.timestamps = timestamps
         self.wind_speeds = np.array(wind_speeds).reshape(-1, 1)  # Reshape for compatibility with scalers
         self.scaler = MinMaxScaler(feature_range=(0, 1))  # Initialize scaler
+        logging.info(f"DataPreprocessor initialized with {len(self.timestamps)} timestamps and wind speeds of shape {self.wind_speeds.shape}.")
+        logging.info(f"Scaler initialized with feature range: {self.scaler.feature_range}.")
 
     def scale_data(self):
         """
@@ -27,6 +29,10 @@ class DataPreprocessor:
         """
         logging.info("Scaling data...")
         self.wind_speeds = self.scaler.fit_transform(self.wind_speeds)
+        logging.info(f"Scaling data with initial min: {np.min(self.wind_speeds)}, max: {np.max(self.wind_speeds)}.")
+        scaled_data = self.scaler.fit_transform(self.wind_speeds)
+        logging.info(f"Data scaled with new min: {np.min(scaled_data)}, max: {np.max(scaled_data)}.")
+
         return self.wind_speeds
 
     def split_data(self, test_size=0.2, val_size=0.1, random_state=42):
@@ -53,6 +59,9 @@ class DataPreprocessor:
 
         logging.info(f"Data split completed: Train set size = {len(train_data)}, "
                      f"Validation set size = {len(val_data)}, Test set size = {len(test_data)}")
+        logging.info(f"Splitting data: test_size={test_size}, val_size={val_size} (adjusted: {val_size_adjusted}).")
+        if len(train_data) < 5 or len(val_data) < 5 or len(test_data) < 5:
+            logging.warning("One or more splits have fewer than 5 samples, which may impact model performance.")
 
         return train_data, val_data, test_data
 
@@ -60,5 +69,6 @@ class DataPreprocessor:
         """
         Inversely transform scaled data back to original scale.
         """
-        logging.info("Inversely transforming scaled data.")
+        logging.info(f"Inversely transforming data of shape {data.shape}.")
+
         return self.scaler.inverse_transform(data)
