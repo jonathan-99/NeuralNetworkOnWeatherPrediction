@@ -44,13 +44,9 @@ def main():
         model = NeuralNetworkModel(input_shape=train_data.shape[1])
 
         # Step 5: Train the model
-        # Split train and validation data into features and targets
-        X_train, y_train = train_data[:, :-1], train_data[:, -1]  # Last column as target
-        X_val, y_val = val_data[:, :-1], val_data[:, -1]  # Last column as target
-
         logging.info("Training model...")
-        trainer = ModelTrainer(model)  # Initialize ModelTrainer with just the model
-        history = trainer.train(X_train, y_train, X_val, y_val)  # Pass both X and y for training and validation
+        trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
+        history = trainer.train(train_data[:, :-1], train_data[:, -1])  # Pass the data and target
 
         # Step 6: Evaluate the model
         # Split test_data into features (X_test) and targets (y_test)

@@ -1,25 +1,26 @@
 import os
 import joblib
 import logging
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor  # Example model
 from sklearn.metrics import mean_squared_error
-
 
 # Configure logging for the module
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 class ModelTrainer:
-    def __init__(self, model, output_dir='model_checkpoints'):
+    def __init__(self, model, output_dir='model_checkpoints', test_size=0.2):
         """
-        Initialize the ModelTrainer with the model and output directory.
+        Initialize the ModelTrainer with the model, output directory, and test size for splitting.
 
         Args:
             model: The machine learning model (e.g., from sklearn).
             output_dir (str): Directory where the best model checkpoint will be saved.
+            test_size (float): Proportion of the data to be used as the validation set.
         """
         self.model = model
         self.output_dir = output_dir
+        self.test_size = test_size
 
         # Ensure the output directory exists
         if not os.path.exists(self.output_dir):
@@ -28,25 +29,26 @@ class ModelTrainer:
 
         self.checkpoint_path = os.path.join(self.output_dir, 'best_model.pkl')
 
-    def train(self, X_train, y_train, X_val, y_val, epochs=50):
+    def train(self, data, target, epochs=50):
         """
-        Train the model with training and validation data.
+        Train the model with the provided dataset.
 
         Args:
-            X_train (np.array): Training feature data.
-            y_train (np.array): Training target data.
-            X_val (np.array): Validation feature data.
-            y_val (np.array): Validation target data.
-            epochs (int): Number of epochs for training. Not used in this case, as scikit-learn models don't have epochs.
+            data (np.array): Combined feature data.
+            target (np.array): Target values for the data.
+            epochs (int): Number of epochs for training (not used for scikit-learn models).
 
         Returns:
             history (dict): Dictionary containing training metrics (e.g., MSE).
         """
-        best_mse = float('inf')
+        # Split the data into training and validation sets
+        X_train, X_val, y_train, y_val = train_test_split(data, target, test_size=self.test_size, random_state=42)
         logging.info("Starting model training...")
 
+        best_mse = float('inf')
+
         try:
-            # Train the model using the entire training data
+            # Train the model using the training data
             self.model.fit(X_train, y_train)
             logging.info("Model training completed.")
 
@@ -80,25 +82,3 @@ class ModelTrainer:
             logging.info(f"Best model loaded from {self.checkpoint_path}")
         else:
             logging.error("Best model file not found.")
-
-
-# Example usage
-if __name__ == "__main__":
-    import numpy as np
-
-    # Simulated training and validation data (replace with actual preprocessed data)
-    input_shape = (10, 1)
-    X_train = np.random.rand(100, *input_shape)
-    y_train = np.random.rand(100, 1)
-    X_val = np.random.rand(20, *input_shape)
-    y_val = np.random.rand(20, 1)
-
-    # Initialize a machine learning model (e.g., RandomForestRegressor from scikit-learn)
-    model = RandomForestRegressor(n_estimators=100)
-
-    # Train the model
-    trainer = ModelTrainer(model)
-    history = trainer.train(X_train, y_train, X_val, y_val, epochs=50)
-
-    # Load the best model for evaluation or prediction
-    trainer.load_best_model()
