@@ -69,10 +69,20 @@ class DataPreprocessor:
             train_val_data, test_size=val_size_adjusted, random_state=random_state, shuffle=False
         )
 
-        logging.info(f"Data split completed: Train set size = {len(train_data)}, "
-                     f"Validation set size = {len(val_data)}, Test set size = {len(test_data)}")
+        # Ensure data is reshaped into feature and target sets (X, y)
+        X_train = train_data  # Features for training
+        y_train = train_data  # If the wind speed is the target, keep it as the target (or define your target)
 
-        return train_data, val_data, test_data
+        X_val = val_data  # Features for validation
+        y_val = val_data  # Validation target
+
+        X_test = test_data  # Features for test
+        y_test = test_data  # Test target
+
+        logging.info(f"Data split completed: Train set size = {len(X_train)}, "
+                     f"Validation set size = {len(X_val)}, Test set size = {len(X_test)}")
+
+        return X_train, X_val, X_test, y_train, y_val, y_test
 
     def inverse_transform(self, data):
         """

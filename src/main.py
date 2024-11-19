@@ -29,14 +29,16 @@ def main():
         logging.info("Step 2: Preprocessing data...")
         preprocessor = DataPreprocessor(timestamps, wind_speeds)
         scaled_data = preprocessor.scale_data()
-        train_data, val_data, test_data = preprocessor.split_data()
+
+        # Get the data split into train, validation, and test sets
+        X_train, X_val, X_test, y_train, y_val, y_test = preprocessor.split_data()
 
         logging.info(f"Data split completed: "
-                     f"Training set size: {train_data.shape[0]}, "
-                     f"Validation set size: {val_data.shape[0]}, "
-                     f"Test set size: {test_data.shape[0]}")
+                     f"Training set size: {X_train.shape[0]}, "
+                     f"Validation set size: {X_val.shape[0]}, "
+                     f"Test set size: {X_test.shape[0]}")
 
-        if train_data.size == 0 or val_data.size == 0 or test_data.size == 0:
+        if X_train.size == 0 or X_val.size == 0 or X_test.size == 0:
             logging.error("Data splitting resulted in an empty set. Check the input data and split parameters.")
             return
 
@@ -53,19 +55,17 @@ def main():
 
         # Step 5: Train the model
         logging.info("Training model...")
-        logging.info(f"Shape of train data: {train_data.shape}")
-        logging.info(f"Shape of train features: {train_data[:, :-1].shape}")
-        logging.info(f"Shape of train targets: {train_data[:, -1].shape}")
+        logging.info(f"Shape of train data: {X_train.shape}")
+        logging.info(f"Shape of train features: {X_train.shape}")
+        logging.info(f"Shape of train targets: {y_train.shape}")
 
         trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
-        history = trainer.train(train_data[:, :-1], train_data[:, -1])  # Pass the data and target
+        trainer.train(X_train, y_train)  # Pass the data and target
 
         logging.info("Model training completed.")
 
         # Step 6: Evaluate the model
         logging.info("Step 6: Evaluating the model...")
-        X_test, y_test = test_data[:, :-1], test_data[:, -1]  # Last column as target
-
         evaluator = ModelEvaluator(model)
         metrics = evaluator.evaluate(X_test, y_test)
 
@@ -82,7 +82,7 @@ def main():
 
         # Step 7: Visualize predictions
         logging.info("Step 7: Visualizing final predictions...")
-        plot_predictions(model, test_data)
+        plot_predictions(model, X_test, y_test)
 
         logging.info("Pipeline completed successfully.")
 
