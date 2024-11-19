@@ -27,11 +27,15 @@ class DataPreprocessor:
         """
         Scale the wind speed data using Min-Max normalization.
         """
-        logging.info("Scaling data...")
+        logging.info(f"Original shape of wind_speeds: {self.wind_speeds.shape}")
+
+        # Scale the data using Min-Max scaling
         self.wind_speeds = self.scaler.fit_transform(self.wind_speeds)
-        logging.info(f"Scaling data with initial min: {np.min(self.wind_speeds)}, max: {np.max(self.wind_speeds)}.")
-        scaled_data = self.scaler.fit_transform(self.wind_speeds)
-        logging.info(f"Data scaled with new min: {np.min(scaled_data)}, max: {np.max(scaled_data)}.")
+
+        # Log the min and max values of the scaled data
+        logging.info(f"Data scaled with initial min: {np.min(self.wind_speeds)}, max: {np.max(self.wind_speeds)}.")
+
+        logging.info(f"Scaled data shape: {self.wind_speeds.shape}")
 
         return self.wind_speeds
 
@@ -39,14 +43,13 @@ class DataPreprocessor:
         """
         Split the data into training, validation, and test sets.
         """
-        if len(self.wind_speeds) == 0:
-            logging.error("Error: Cannot split empty data.")
-            raise ValueError("No data available for splitting.")
-
-        logging.info("Splitting data into training, validation, and test sets...")
+        logging.info(f"Splitting data: test_size={test_size}, val_size={val_size} (adjusted: {val_size_adjusted}).")
         train_val_data, test_data = train_test_split(
             self.wind_speeds, test_size=test_size, random_state=random_state, shuffle=False
         )
+
+        logging.info(
+            f"Train and test split: Train data shape = {train_val_data.shape}, Test data shape = {test_data.shape}")
 
         if len(train_val_data) == 0 or len(test_data) == 0:
             logging.error("Error: Training or test set is empty after split.")
@@ -57,11 +60,8 @@ class DataPreprocessor:
             train_val_data, test_size=val_size_adjusted, random_state=random_state, shuffle=False
         )
 
-        logging.info(f"Data split completed: Train set size = {len(train_data)}, "
-                     f"Validation set size = {len(val_data)}, Test set size = {len(test_data)}")
-        logging.info(f"Splitting data: test_size={test_size}, val_size={val_size} (adjusted: {val_size_adjusted}).")
-        if len(train_data) < 5 or len(val_data) < 5 or len(test_data) < 5:
-            logging.warning("One or more splits have fewer than 5 samples, which may impact model performance.")
+        logging.info(f"Train, validation, and test split: Train data shape = {train_data.shape}, "
+                     f"Validation data shape = {val_data.shape}, Test data shape = {test_data.shape}")
 
         return train_data, val_data, test_data
 
