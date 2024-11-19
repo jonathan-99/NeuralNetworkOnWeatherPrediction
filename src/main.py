@@ -52,7 +52,11 @@ def main():
         logging.info("Model initialized.")
 
         # Step 5: Train the model
-        logging.info("Step 5: Training the model...")
+        logging.info("Training model...")
+        logging.info(f"Shape of train data: {train_data.shape}")
+        logging.info(f"Shape of train features: {train_data[:, :-1].shape}")
+        logging.info(f"Shape of train targets: {train_data[:, -1].shape}")
+
         trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
         history = trainer.train(train_data[:, :-1], train_data[:, -1])  # Pass the data and target
 

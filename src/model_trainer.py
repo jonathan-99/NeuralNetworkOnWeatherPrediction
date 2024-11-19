@@ -31,7 +31,7 @@ class ModelTrainer:
 
     def train(self, data, target):
         """
-        Train the model with the provided dataset.
+        Train the model with the provided dataset and log detailed training history.
 
         Args:
             data (np.array): Combined feature data.
@@ -43,6 +43,7 @@ class ModelTrainer:
         # Split the data into training and validation sets
         X_train, X_val, y_train, y_val = train_test_split(data, target, test_size=self.test_size, random_state=42)
         logging.info("Starting model training...")
+        logging.info(f"Training data size: {X_train.shape[0]} samples, Validation data size: {X_val.shape[0]} samples")
 
         best_mse = float('inf')
         history = {}
@@ -50,21 +51,30 @@ class ModelTrainer:
         try:
             # Train the model using the training data
             self.model.fit(X_train, y_train)
-            logging.info("Model training completed.")
+            logging.info("Model training completed successfully.")
 
             # Evaluate on validation data
             val_predictions = self.model.predict(X_val)
             val_mse = mean_squared_error(y_val, val_predictions)
-            logging.info(f"Validation MSE: {val_mse:.4f}")
+            logging.info(f"Validation Mean Squared Error (MSE): {val_mse:.4f}")
 
             # Save the model if it's the best performing one
             if val_mse < best_mse:
                 best_mse = val_mse
                 joblib.dump(self.model, self.checkpoint_path)
                 logging.info(f"Best model saved with MSE: {best_mse:.4f} at {self.checkpoint_path}")
+            else:
+                logging.info(f"Model with MSE: {val_mse:.4f} did not improve the best MSE: {best_mse:.4f}")
 
+            # Add detailed information to the history dictionary
             history['val_mse'] = val_mse
             history['best_mse'] = best_mse
+            history['train_samples'] = X_train.shape[0]
+            history['val_samples'] = X_val.shape[0]
+
+            logging.info("Training history:")
+            for key, value in history.items():
+                logging.info(f"{key}: {value}")
 
         except Exception as e:
             logging.error(f"An error occurred during training: {e}")
