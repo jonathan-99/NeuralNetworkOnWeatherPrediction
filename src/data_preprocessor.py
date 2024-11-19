@@ -43,25 +43,34 @@ class DataPreprocessor:
         """
         Split the data into training, validation, and test sets.
         """
-        logging.info(f"Splitting data: test_size={test_size}, val_size={val_size} (adjusted: {val_size_adjusted}).")
+        if len(self.wind_speeds) == 0:
+            logging.error("Error: Cannot split empty data.")
+            raise ValueError("No data available for splitting.")
+
+        logging.info("Splitting data into training, validation, and test sets...")
+
+        # First split into training+validation and test sets
         train_val_data, test_data = train_test_split(
             self.wind_speeds, test_size=test_size, random_state=random_state, shuffle=False
         )
-
-        logging.info(
-            f"Train and test split: Train data shape = {train_val_data.shape}, Test data shape = {test_data.shape}")
 
         if len(train_val_data) == 0 or len(test_data) == 0:
             logging.error("Error: Training or test set is empty after split.")
             raise ValueError("Insufficient data to create non-empty splits.")
 
+        # Adjust validation size relative to the training+validation data
         val_size_adjusted = val_size / (1 - test_size)
+
+        # Log the adjusted validation size
+        logging.info(f"Adjusted validation size: {val_size_adjusted:.4f} (calculated based on test_size={test_size})")
+
+        # Now split the training+validation set into separate train and validation sets
         train_data, val_data = train_test_split(
             train_val_data, test_size=val_size_adjusted, random_state=random_state, shuffle=False
         )
 
-        logging.info(f"Train, validation, and test split: Train data shape = {train_data.shape}, "
-                     f"Validation data shape = {val_data.shape}, Test data shape = {test_data.shape}")
+        logging.info(f"Data split completed: Train set size = {len(train_data)}, "
+                     f"Validation set size = {len(val_data)}, Test set size = {len(test_data)}")
 
         return train_data, val_data, test_data
 
