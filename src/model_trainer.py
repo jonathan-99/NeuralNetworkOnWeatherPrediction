@@ -4,6 +4,7 @@ import logging
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
+from src.metrics import metrics
 
 # Configure logging for the module
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -29,7 +30,7 @@ class ModelTrainer:
 
         self.checkpoint_path = os.path.join(self.output_dir, 'best_model.pkl')
 
-    def train(self, data, target):
+    def train(self, data, target, metric_obj:metrics):
         """
         Train the model with the provided dataset and log detailed training history.
 
@@ -73,7 +74,9 @@ class ModelTrainer:
 
             # Add detailed information to the history dictionary
             history['val_mse'] = val_mse
+            metric_obj.val_mse = val_mse
             history['best_mse'] = best_mse
+            metric_obj.best_mse = best_mse
             history['train_samples'] = X_train.shape[0]
             history['val_samples'] = X_val.shape[0]
 

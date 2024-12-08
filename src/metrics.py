@@ -25,11 +25,37 @@ class Metrics:
                 "regularisation_techniques": self.regularisation_techniques
             }
 
+    class Timings:
+        def __init__(self, loading_data=0.0, preprocessing=0.0, virtualising=0.0, building=0.0,
+                     training=0.0, evaluating=0.0, prediction=0.0, visualising_predictions=0.0):
+            self.loading_data = loading_data
+            self.preprocessing = preprocessing
+            self.virtualising = virtualising
+            self.building = building
+            self.training = training
+            self.evaluating = evaluating
+            self.prediction = prediction
+            self.visualising_predictions = visualising_predictions
+
+        def to_dict(self):
+            return {
+                "loading_data": self.loading_data,
+                "preprocessing": self.preprocessing,
+                "virtualising": self.virtualising,
+                "building": self.building,
+                "training": self.training,
+                "evaluating": self.evaluating,
+                "prediction": self.prediction,
+                "visualising_predictions": self.visualising_predictions,
+            }
+
     def __init__(self):
         self.validation_mse = 0.0
         self.training_mse = 0.0
         self.rmse_value = 0.0
         self.mae_value = 0.0
+        self.val_mse = 0.0
+        self.best_mse = 0.0
         self.number_of_layers = 0
         self.number_of_parameters = 0
         self.number_of_units_in_each_layer = []
@@ -37,7 +63,9 @@ class Metrics:
         self.vc_dimension = 0
         self.rademacher_complexity = 0.0
         self.bayesian_information_criterion = 0.0
-        self.training_time = 0.0
+        self.x_train_shape = 0.0
+        self.y_train_shape = 0.0
+        self.timings = self.Timings()
         self.hyperparameters = self.Hyperparameters()
 
     def set_validation_mse(self, value):

@@ -8,17 +8,23 @@ from src.model_trainer import ModelTrainer
 from src.model_evaluator import ModelEvaluator
 from src.visualise_predictions import plot_predictions
 from sklearn.ensemble import RandomForestRegressor  # Example model
+from src.metrics import metrics, Metrics
+import datetime
 
 # Configure logging for the main module
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 def main():
     try:
+        metric_object = Metrics()
+
         # Step 1: Load the data
+        start = datetime.datetime.now()
         logging.info("Step 1: Loading data...")
         wind_data = WindSpeedData(['train_data/2024-02-05.txt', 'train_data/2024-02-06.txt'])
         timestamps, wind_speeds = wind_data.get_data()
+        finish = datetime.datetime.now()
+        metric_object.timings.loading_data = finish - start
 
         if not timestamps or not wind_speeds:
             logging.error("Data loading failed. No data found.")
@@ -26,9 +32,12 @@ def main():
         logging.info(f"Loaded data with {len(timestamps)} records.")
 
         # Step 2: Preprocess the data
+        start = datetime.datetime.now()
         logging.info("Step 2: Preprocessing data...")
         preprocessor = DataPreprocessor(timestamps, wind_speeds)
         scaled_data = preprocessor.scale_data()
+        finish = datetime.datetime.now()
+        metric_object.timings.preprocessing = finish - start
 
         # Get the data split into train, validation, and test sets
         X_train, X_val, X_test, y_train, y_val, y_test = preprocessor.split_data()
@@ -43,49 +52,67 @@ def main():
             return
 
         # Step 3: Visualize the preprocessed data (optional)
+        start = datetime.datetime.now()
         logging.info("Step 3: Visualizing raw and preprocessed data...")
         visualizer = DataVisualizer(timestamps, wind_speeds, preprocessed_data=scaled_data)
         visualizer.plot_raw_data()
         visualizer.plot_preprocessed_data()
+        finish = datetime.datetime.now()
+        metric_object.timings.virtualising = finish - start
 
         # Step 4: Build the model
+        start = datetime.datetime.now()
         logging.info("Step 4: Building the model...")
         model = RandomForestRegressor(n_estimators=100, random_state=42)  # Replace with preferred sklearn model
         logging.info("Model initialized.")
+        finish = datetime.datetime.now()
+        metric_object.timings.building = finish - start
 
         # Step 5: Train the model
+        start = datetime.datetime.now()
         logging.info("Training model...")
-        logging.info(f"Shape of train data: {X_train.shape}")
-        logging.info(f"Shape of train features: {X_train.shape}")
-        logging.info(f"Shape of train targets: {y_train.shape}")
+        metric_object.x_train_shape = X_train.shape
+        metric_object.y_train_shape = y_train.shape
 
         trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
-        trainer.train(X_train, y_train)  # Pass the data and target
-
+        trainer.train(X_train, y_train, metric_object)  # Pass the data and target
         logging.info("Model training completed.")
+        finish = datetime.datetime.now()
+        metric_object.timings.training = finish - start
 
         # Step 6: Evaluate the model
+        start = datetime.datetime.now()
         logging.info("Step 6: Evaluating the model...")
         evaluator = ModelEvaluator(model)
         metrics = evaluator.evaluate(X_test, y_test)
-
+        finish = datetime.datetime.now()
+        metric_object.timings.evaluating = finish - start
         logging.info(f"Evaluation metrics: {metrics}")
 
         # Generate predictions for visualization
+        start = datetime.datetime.now()
         logging.info("Generating predictions for the test set...")
         predictions = model.predict(X_test)
+        finish = datetime.datetime.now()
+        metric_object.timings.prediction = finish - start
         logging.info("Predictions generated.")
 
         # Visualize the predictions
+        start = datetime.datetime.now()
         evaluator.plot_predictions(y_test, predictions)
+        finish = datetime.datetime.now()
+        metric_object.timings.visualising_predictions = finish - start
         logging.info("Model evaluation and visualization completed.")
 
         # Step 7: Visualize predictions
         logging.info("Step 7: Visualizing final predictions...")
+        start = datetime.datetime.now()
         plot_predictions(model, X_test, y_test)
+        finish = datetime.datetime.now()
+        metric_object.timings.visualising = finish - start
 
         logging.info("Pipeline completed successfully.")
-
+        metric_object.save_metric_to_file()
     except Exception as e:
         logging.error(f"An unexpected error occurred during execution: {e}")
 
