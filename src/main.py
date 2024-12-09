@@ -66,8 +66,10 @@ def main():
         # Define input shape based on training data
         input_shape = X_train.shape[1:]  # this assumes the correct format...error check
         # Initialize the model using NeuralNetworkModel from model_builder.py
-        metric_object.number_of_trees_in_forest, n_estimators = 100
-        metric_object.max_depth, max_depth = 5
+        n_estimators = 100
+        metric_object.number_of_trees_in_forest = n_estimators
+        max_depth = 5
+        metric_object.max_depth = max_depth
         model = NeuralNetworkModel(input_shape=input_shape, n_estimators=n_estimators, max_depth=max_depth)
         model.get_model_summary()
         # Train the model on the training data
