@@ -52,6 +52,12 @@ class NeuralNetworkModel:
         print(f"Training complete. Mean Squared Error on training data: {mse}")
         return {'mse': mse}
 
+    def fit(self, X_train, y_train):
+        """
+        Alias for train() to maintain compatibility with external calls.
+        """
+        return self.train(X_train, y_train)
+
     def evaluate(self, X_test, y_test):
         """
         Evaluate the model on the test data.
@@ -79,6 +85,7 @@ class NeuralNetworkModel:
             np.array: Predicted values.
         """
         return self.model.predict(X)
+
 
 
 # Example usage
