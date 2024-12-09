@@ -68,6 +68,7 @@ class Metrics:
         self.y_train_shape = 0.0
         self.max_depth = 0
         self.number_of_trees_in_forest = 0 # up == complexity
+        self.training_time = 0.0
         self.timings = self.Timings()
         self.hyperparameters = self.Hyperparameters()
 
