@@ -79,8 +79,11 @@ class DataPreprocessor:
         X_test = test_data  # Features for test
         y_test = test_data  # Test target
 
-        logging.info(f"Data split completed: Train set size = {len(X_train)}, "
-                     f"Validation set size = {len(X_val)}, Test set size = {len(X_test)}")
+        # Enhanced logging to show the shape of each dataset
+        logging.info(f"Data split completed:")
+        logging.info(f"  Train set: Size = {len(X_train)}, Shape = {X_train.shape}, y_train shape = {y_train.shape}")
+        logging.info(f"  Validation set: Size = {len(X_val)}, Shape = {X_val.shape}, y_val shape = {y_val.shape}")
+        logging.info(f"  Test set: Size = {len(X_test)}, Shape = {X_test.shape}, y_test shape = {y_test.shape}")
 
         return X_train, X_val, X_test, y_train, y_val, y_test
 

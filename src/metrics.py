@@ -56,6 +56,7 @@ class Metrics:
         self.mae_value = 0.0
         self.val_mse = 0.0
         self.best_mse = 0.0
+        self.mse = 0.0
         self.number_of_layers = 0
         self.number_of_parameters = 0
         self.number_of_units_in_each_layer = []
@@ -65,6 +66,8 @@ class Metrics:
         self.bayesian_information_criterion = 0.0
         self.x_train_shape = 0.0
         self.y_train_shape = 0.0
+        self.max_depth = 0
+        self.number_of_trees_in_forest = 0 # up == complexity
         self.timings = self.Timings()
         self.hyperparameters = self.Hyperparameters()
 

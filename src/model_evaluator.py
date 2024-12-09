@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import joblib  # For loading models saved with joblib or sklearn
+from src.metrics import metrics
 
 
 class ModelEvaluator:

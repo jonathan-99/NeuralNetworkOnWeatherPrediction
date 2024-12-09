@@ -7,7 +7,7 @@ from src.data_visualizer import DataVisualizer
 from src.model_trainer import ModelTrainer
 from src.model_evaluator import ModelEvaluator
 from src.visualise_predictions import plot_predictions
-from sklearn.ensemble import RandomForestRegressor  # Example model
+from src.model_builder import NeuralNetworkModel
 from src.metrics import metrics, Metrics
 import datetime
 
@@ -63,8 +63,19 @@ def main():
         # Step 4: Build the model
         start = datetime.datetime.now()
         logging.info("Step 4: Building the model...")
-        model = RandomForestRegressor(n_estimators=100, random_state=42)  # Replace with preferred sklearn model
-        logging.info("Model initialized.")
+        # Define input shape based on training data
+        input_shape = X_train.shape[1:]  # this assumes the correct format...error check
+        # Initialize the model using NeuralNetworkModel from model_builder.py
+        metric_object.number_of_trees_in_forest, n_estimators = 100
+        metric_object.max_depth, max_depth = 5
+        model = NeuralNetworkModel(input_shape=input_shape, n_estimators=n_estimators, max_depth=max_depth)
+        model.get_model_summary()
+        # Train the model on the training data
+        logging.info("Training the model...")
+        train_metrics = model.train(X_train, y_train)
+        # Store additional metrics in the Metrics object
+        metric_object.training_mse = train_metrics['mse']
+        logging.info("Model training completed.")
         finish = datetime.datetime.now()
         metric_object.timings.building = finish - start
 
@@ -73,7 +84,6 @@ def main():
         logging.info("Training model...")
         metric_object.x_train_shape = X_train.shape
         metric_object.y_train_shape = y_train.shape
-
         trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
         trainer.train(X_train, y_train, metric_object)  # Pass the data and target
         logging.info("Model training completed.")
@@ -85,6 +95,9 @@ def main():
         logging.info("Step 6: Evaluating the model...")
         evaluator = ModelEvaluator(model)
         metrics = evaluator.evaluate(X_test, y_test)
+        metric_object.mse = metrics['mse']
+        metric_object.rmse_value = metrics['rmse']
+        metric_object.mae_value = metrics['mae']
         finish = datetime.datetime.now()
         metric_object.timings.evaluating = finish - start
         logging.info(f"Evaluation metrics: {metrics}")
