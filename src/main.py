@@ -8,7 +8,7 @@ from src.model_trainer import ModelTrainer
 from src.model_evaluator import ModelEvaluator
 from src.visualise_predictions import plot_predictions
 from src.model_builder import NeuralNetworkModel
-from src.metrics import metrics, Metrics
+from src.metrics import Metrics
 import datetime
 
 # Configure logging for the main module
