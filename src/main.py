@@ -90,7 +90,7 @@ def main():
         trainer.train(X_train, y_train, metric_object)  # Pass the data and target
         logging.info("Model training completed.")
         finish = datetime.datetime.now()
-        metric_object.timings.training = finish - start
+        metric_object.timings.training_time = finish - start
 
         # Step 6: Evaluate the model
         start = datetime.datetime.now()

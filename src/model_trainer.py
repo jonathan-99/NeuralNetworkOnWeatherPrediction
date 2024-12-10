@@ -74,9 +74,9 @@ class ModelTrainer:
 
             # Add detailed information to the history dictionary
             history['val_mse'] = val_mse
-            metric_obj.val_mse = val_mse
+            metric_obj.Statistics.validation_mse = val_mse
             history['best_mse'] = best_mse
-            metric_obj.best_mse = best_mse
+            metric_obj.Statistics.best_mse = best_mse
             history['train_samples'] = X_train.shape[0]
             history['val_samples'] = X_val.shape[0]
 

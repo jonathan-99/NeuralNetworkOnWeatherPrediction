@@ -1,0 +1,20 @@
+{
+    "validation_mse": 0.0,
+    "training_mse": 1.321205930028877e-05,
+    "rmse_value": 0.23502726735098267,
+    "mae_value": 0.10236140764077895,
+    "number_of_layers": 0,
+    "number_of_parameters": 0,
+    "number_of_units_in_each_layer": [],
+    "activation_functions": [],
+    "vc_dimension": 0,
+    "rademacher_complexity": 0.0,
+    "bayesian_information_criterion": 0.0,
+    "training_time": 0.0,
+    "hyperparameters": {
+        "learning_rate": 0.01,
+        "number_of_hidden_layers": 1,
+        "batch_size": 32,
+        "number_of_epochs": 10,
+        "regularisation_techniques": []
+  } }

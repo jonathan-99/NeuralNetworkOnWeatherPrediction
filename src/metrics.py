@@ -26,37 +26,80 @@ class Metrics:
             }
 
     class Timings:
-        def __init__(self, loading_data=0.0, preprocessing=0.0, virtualising=0.0, building=0.0,
-                     training=0.0, evaluating=0.0, prediction=0.0, visualising_predictions=0.0):
+        def __init__(self, loading_data=None, preprocessing=None, virtualising=None, building=None,
+                     evaluating=None, prediction=None, visualising_predictions=None, training_time=None):
+            """
+            Initialize the Timings object.
+
+            :param loading_data: Time spent loading data as a timedelta or None.
+            :param preprocessing: Time spent preprocessing data as a timedelta or None.
+            :param virtualising: Time spent virtualizing processes as a timedelta or None.
+            :param building: Time spent building models as a timedelta or None.
+            :param evaluating: Time spent evaluating models as a timedelta or None.
+            :param prediction: Time spent on predictions as a timedelta or None.
+            :param visualising_predictions: Time spent visualizing predictions as a timedelta or None.
+            :param training_time: Time spent on training as a timedelta or None.
+            """
             self.loading_data = loading_data
             self.preprocessing = preprocessing
             self.virtualising = virtualising
             self.building = building
-            self.training = training
             self.evaluating = evaluating
             self.prediction = prediction
             self.visualising_predictions = visualising_predictions
+            self.training_time = training_time
+
+        def to_dict(self):
+            """
+            Convert the Timings object to a dictionary, serializing timedelta objects to strings.
+            """
+            return {
+                "loading_data": str(self.loading_data) if self.loading_data else None,
+                "preprocessing": str(self.preprocessing) if self.preprocessing else None,
+                "virtualising": str(self.virtualising) if self.virtualising else None,
+                "building": str(self.building) if self.building else None,
+                "evaluating": str(self.evaluating) if self.evaluating else None,
+                "prediction": str(self.prediction) if self.prediction else None,
+                "visualising_predictions": str(self.visualising_predictions) if self.visualising_predictions else None,
+                "training_time": str(self.training_time) if self.training_time else None,
+            }
+
+        def set_timing(self, variable_name, start, finish):
+            """
+            Calculate and set the timing for a given variable as a timedelta.
+
+            :param variable_name: The name of the attribute to set (e.g., 'loading_data').
+            :param start: The start datetime.
+            :param finish: The finish datetime.
+            """
+            if not hasattr(self, variable_name):
+                raise AttributeError(f"{variable_name} is not a valid timing attribute.")
+
+            if isinstance(start, datetime) and isinstance(finish, datetime):
+                setattr(self, variable_name, finish - start)
+            else:
+                raise ValueError("Start and finish must be datetime objects.")
+
+    class Statistics:
+        def __init__(self):
+            self.validation_mse = 0.0
+            self.training_mse = 0.0
+            self.rmse_value = 0.0
+            self.mae_value = 0.0
+            self.val_mse = 0.0
+            self.best_mse = 0.0
+            self.mse = 0.0
 
         def to_dict(self):
             return {
-                "loading_data": self.loading_data,
-                "preprocessing": self.preprocessing,
-                "virtualising": self.virtualising,
-                "building": self.building,
-                "training": self.training,
-                "evaluating": self.evaluating,
-                "prediction": self.prediction,
-                "visualising_predictions": self.visualising_predictions,
+                "validation_mse": self.validation_mse,
+                "training_mse": self.training_mse,
+                "rmse_value": self.rmse_value,
+                "mae_value": self.mae_value,
+                "mae_value": self.best_mse,
+                "mse": self.mse,
             }
-
     def __init__(self):
-        self.validation_mse = 0.0
-        self.training_mse = 0.0
-        self.rmse_value = 0.0
-        self.mae_value = 0.0
-        self.val_mse = 0.0
-        self.best_mse = 0.0
-        self.mse = 0.0
         self.number_of_layers = 0
         self.number_of_parameters = 0
         self.number_of_units_in_each_layer = []
@@ -68,25 +111,15 @@ class Metrics:
         self.y_train_shape = 0.0
         self.max_depth = 0
         self.number_of_trees_in_forest = 0 # up == complexity
-        self.training_time = 0.0
+        self.statistics = self.Statistics()
         self.timings = self.Timings()
         self.hyperparameters = self.Hyperparameters()
 
-    def set_validation_mse(self, value):
-        if isinstance(value, (float, int)):
-            self.validation_mse = float(value)
-        else:
-            logging.error("Invalid value for Validation MSE")
-            raise ValueError("Validation MSE must be a float or integer.")
-
-    # Similarly, add set_ methods with validation for other variables...
-
     def get_metrics(self):
         return {
-            "validation_mse": self.validation_mse,
-            "training_mse": self.training_mse,
-            "rmse_value": self.rmse_value,
-            "mae_value": self.mae_value,
+            "statistics": self.statistics.to_dict(),
+            "timings": self.timings.to_dict(),
+            "hyperparameters": self.hyperparameters.to_dict(),
             "number_of_layers": self.number_of_layers,
             "number_of_parameters": self.number_of_parameters,
             "number_of_units_in_each_layer": self.number_of_units_in_each_layer,
@@ -94,8 +127,10 @@ class Metrics:
             "vc_dimension": self.vc_dimension,
             "rademacher_complexity": self.rademacher_complexity,
             "bayesian_information_criterion": self.bayesian_information_criterion,
-            "training_time": self.training_time,
-            "hyperparameters": self.hyperparameters.to_dict()
+            "x_train_shape": self.x_train_shape,
+            "y_train_shape": self.y_train_shape,
+            "max_depth": self.max_depth,
+            "number_of_trees_in_forest": self.number_of_trees_in_forest
         }
 
     def get_all(self):
