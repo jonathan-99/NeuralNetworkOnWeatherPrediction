@@ -1,12 +1,7 @@
-# orchestration.py
-
+import argparse
 import src.utils as utils
 import src.main as train_and_test
-import subprocess
-import sys
-import os
-
-
+from src.performance_analytics import PerformanceAnalytics
 
 def setup(parameter=None):
     """
@@ -16,9 +11,7 @@ def setup(parameter=None):
         parameter (str): Optional parameter to be passed to setup functions.
     """
     print(f"Running setup with parameter: {parameter}")
-
     utils.setup()
-
 
 def of_we_go(parameter=None):
     """
@@ -30,12 +23,46 @@ def of_we_go(parameter=None):
     print(f"Running neural network training with parameter: {parameter}")
     train_and_test.main()  # Execute the main training process
 
+def analyse(json_file):
+    """
+    Analyzes the performance based on a provided JSON file.
+
+    Args:
+        json_file (str): Path to the JSON file to analyze.
+    """
+    print(f"Analyzing performance using file: {json_file}")
+    analytics_object = PerformanceAnalytics(json_file)
+    print("Summary Statistics:")
+    print(analytics_object.get_summary_statistics())
+    print("Average Timings:")
+    print(analytics_object.get_average_timings())
+
+def main():
+    parser = argparse.ArgumentParser(description="Orchestrate neural network training and performance analysis.")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Subparser for setup
+    parser_setup = subparsers.add_parser("setup", help="Perform setup operations.")
+    parser_setup.add_argument("parameter", type=str, nargs="?", help="Optional setup parameter.")
+
+    # Subparser for training
+    parser_train = subparsers.add_parser("train", help="Run the neural network training process.")
+    parser_train.add_argument("parameter", type=str, nargs="?", help="Optional training parameter.")
+
+    # Subparser for analysis
+    parser_analyse = subparsers.add_parser("analyse", help="Analyze performance based on a JSON file.")
+    parser_analyse.add_argument("json_file", type=str, help="Path to the JSON file for analysis.")
+
+    args = parser.parse_args()
+
+    if args.command == "setup":
+        setup(args.parameter)
+    elif args.command == "train":
+        of_we_go(args.parameter)
+    elif args.command == "analyse":
+        analyse(args.json_file)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Error: Missing parameter string. Please provide a parameter.")
-        sys.exit(1)
-
-    param_string = sys.argv[1]  # Get the first parameter from the command line argument
-    setup(param_string)  # Step 1: Setup - Generate requirements.txt and install packages
-    of_we_go(param_string)  # Step 2: Run the training process
+    main()
