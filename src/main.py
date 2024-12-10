@@ -87,7 +87,10 @@ def main():
         metric_object.x_train_shape = X_train.shape
         metric_object.y_train_shape = y_train.shape
         trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
-        trainer.train(X_train, y_train, metric_object)  # Pass the data and target
+        training_output = trainer.train(X_train, y_train)
+        logging.info(f'Training history - {training_output}')
+        metric_object.statistics.validation_mse = training_output['val_mse']
+        metric_object.statistics.best_mse = training_output['best_mse']
         logging.info("Model training completed.")
         finish = datetime.datetime.now()
         metric_object.timings.training_time = finish - start

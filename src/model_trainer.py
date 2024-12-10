@@ -30,7 +30,7 @@ class ModelTrainer:
 
         self.checkpoint_path = os.path.join(self.output_dir, 'best_model.pkl')
 
-    def train(self, data, target, metric_obj:Metrics):
+    def train(self, data, target):
         """
         Train the model with the provided dataset and log detailed training history.
 
@@ -74,9 +74,7 @@ class ModelTrainer:
 
             # Add detailed information to the history dictionary
             history['val_mse'] = val_mse
-            metric_obj.Statistics.validation_mse = val_mse
             history['best_mse'] = best_mse
-            metric_obj.Statistics.best_mse = best_mse
             history['train_samples'] = X_train.shape[0]
             history['val_samples'] = X_val.shape[0]
 
