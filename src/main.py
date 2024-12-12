@@ -66,18 +66,31 @@ def main():
         # Define input shape based on training data
         input_shape = X_train.shape[1:]  # this assumes the correct format...error check
         # Initialize the model using NeuralNetworkModel from model_builder.py
-        n_estimators = 100
-        metric_object.number_of_trees_in_forest = n_estimators
+        metric_object.number_of_trees_in_forest = 100
         max_depth = 5
         metric_object.max_depth = max_depth
-        model = NeuralNetworkModel(input_shape=input_shape, n_estimators=n_estimators, max_depth=max_depth)
-        model.get_model_summary()
+        model = NeuralNetworkModel(input_shape=input_shape, n_estimators=metric_object.number_of_trees_in_forest, max_depth=max_depth)
         # Train the model on the training data
         logging.info("Training the model...")
         train_metrics = model.train(X_train, y_train)
         # Store additional metrics in the Metrics object
+        model_object = model.get_model_structure_metrics()
+        metric_object.statistics.total_splits = model_object['total_splits']
+        metric_object.statistics.total_nodes = model_object['total_nodes']
+        metric_object.statistics.total_leaves = model_object['total_leaves']
         metric_object.training_mse = train_metrics['mse']
         logging.info("Model training completed.")
+
+        # Call get_advanced_metrics to capture additional model insights
+        advanced_metrics = model.get_advanced_metrics(X_train, y_train)
+        metric_object.statistics.vc_dimension = advanced_metrics['vc_dimension']
+        metric_object.statistics.rademacher_complexity = advanced_metrics['rademacher_complexity']
+        metric_object.statistics.bayesian_information_criterion = advanced_metrics['bayesian_information_criterion']
+
+        logging.info(f"Advanced Metrics: VC Dimension={advanced_metrics['vc_dimension']}, "
+                     f"Rademacher Complexity={advanced_metrics['rademacher_complexity']}, "
+                     f"BIC={advanced_metrics['bayesian_information_criterion']}")
+
         finish = datetime.datetime.now()
         metric_object.timings.building = finish - start
 

@@ -22,6 +22,7 @@ class Metrics:
                 "number_of_hidden_layers": self.number_of_hidden_layers,
                 "batch_size": self.batch_size,
                 "number_of_epochs": self.number_of_epochs,
+                "total_splits": self.total_splits,
                 "regularisation_techniques": self.regularisation_techniques
             }
 
@@ -48,6 +49,9 @@ class Metrics:
             self.prediction = prediction
             self.visualising_predictions = visualising_predictions
             self.training_time = training_time
+            self.total_splits = total_splits
+            self.total_nodes = total_nodes
+            self.total_leaves = total_leaves
 
         def to_dict(self):
             """
@@ -89,6 +93,9 @@ class Metrics:
             self.val_mse = 0.0
             self.best_mse = 0.0
             self.mse = 0.0
+            self.total_splits = 0
+            self.total_nodes = 0
+            self.total_leaves = 0
 
         def to_dict(self):
             return {
@@ -98,9 +105,11 @@ class Metrics:
                 "mae_value": self.mae_value,
                 "mae_value": self.best_mse,
                 "mse": self.mse,
+                "total_splits": self.total_splits,
+                "total_nodes": self.total_nodes,
+                "total_leaves": self.total_leaves,
             }
     def __init__(self):
-        self.number_of_layers = 0
         self.number_of_parameters = 0
         self.number_of_units_in_each_layer = []
         self.activation_functions = []
@@ -120,7 +129,6 @@ class Metrics:
             "statistics": self.statistics.to_dict(),
             "timings": self.timings.to_dict(),
             "hyperparameters": self.hyperparameters.to_dict(),
-            "number_of_layers": self.number_of_layers,
             "number_of_parameters": self.number_of_parameters,
             "number_of_units_in_each_layer": self.number_of_units_in_each_layer,
             "activation_functions": self.activation_functions,
@@ -172,7 +180,6 @@ if __name__ == "__main__":
         metrics.set_metric("Training MSE", 0.008)
         metrics.set_metric("RMSE_value", 0.1)
         metrics.set_metric("MAE_value", 0.08)
-        metrics.set_metric("number_of_layers", 3)
         metrics.set_metric("number_of_parameters", 1500)
         metrics.set_metric("activation_functions", ["relu", "sigmoid"])
         metrics.set_metric("VC_dimension", 120)

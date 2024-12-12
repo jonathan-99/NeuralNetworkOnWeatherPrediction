@@ -1,0 +1,43 @@
+{
+    "statistics": {
+        "validation_mse": 0.0,
+        "training_mse": 0.0,
+        "rmse_value": 0.0,
+        "mae_value": 0.0,
+        "mse": 0.0
+    },
+    "timings": {
+        "loading_data": "0:00:00.019044",
+        "preprocessing": "0:00:00.010796",
+        "virtualising": "0:00:06.219506",
+        "building": "0:00:01.595993",
+        "evaluating": "0:00:00.084608",
+        "prediction": "0:00:00.078138",
+        "visualising_predictions": "0:00:00.704587",
+        "training_time": "0:00:01.994857"
+    },
+    "hyperparameters": {
+        "learning_rate": 0.01,
+        "number_of_hidden_layers": 1,
+        "batch_size": 32,
+        "number_of_epochs": 10,
+        "regularisation_techniques": []
+    },
+    "number_of_layers": 0,
+    "number_of_parameters": 0,
+    "number_of_units_in_each_layer": [],
+    "activation_functions": [],
+    "vc_dimension": 0,
+    "rademacher_complexity": 0.0,
+    "bayesian_information_criterion": 0.0,
+    "x_train_shape": [
+        33,
+        1
+    ],
+    "y_train_shape": [
+        33,
+        1
+    ],
+    "max_depth": 5,
+    "number_of_trees_in_forest": 100
+}
