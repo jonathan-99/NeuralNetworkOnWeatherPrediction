@@ -21,7 +21,9 @@ def main():
         # Step 1: Load the data
         start = datetime.datetime.now()
         logging.info("Step 1: Loading data...")
-        wind_data = WindSpeedData(['train_data/2024-02-05.txt', 'train_data/2024-02-06.txt'])
+        wind_data = WindSpeedData(['train_data/2024-02-05.txt',
+                                   'train_data/2024-02-06.txt',
+                                   'train_data/2024-02-07.txt'])
         timestamps, wind_speeds = wind_data.get_data()
         finish = datetime.datetime.now()
         metric_object.timings.loading_data = finish - start

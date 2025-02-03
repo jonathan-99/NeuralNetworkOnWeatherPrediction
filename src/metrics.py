@@ -153,19 +153,21 @@ class Metrics:
 
     def get_metrics(self):
         return {
-            "statistics": self.statistics.to_dict(),
-            "timings": self.timings.to_dict(),
-            "hyperparameters": self.hyperparameters.to_dict(),
-            "number_of_parameters": self.number_of_parameters,
-            "number_of_units_in_each_layer": self.number_of_units_in_each_layer,
-            "activation_functions": self.activation_functions,
-            "vc_dimension": self.vc_dimension,
-            "rademacher_complexity": self.rademacher_complexity,
-            "bayesian_information_criterion": self.bayesian_information_criterion,
-            "x_train_shape": self.x_train_shape,
-            "y_train_shape": self.y_train_shape,
-            "max_depth": self.max_depth,
-            "number_of_trees_in_forest": self.number_of_trees_in_forest
+            "Metadata":{
+                self.Metadata.to_dict(),
+            },
+            "Accountancy": {
+                self.Accountant.to_dict(),
+            },
+            "statistics": {
+                self.statistics.to_dict(),
+            },
+            "timings": {
+                self.timings.to_dict(),
+            },
+            "hyperparameters": {
+                self.hyperparameters.to_dict(),
+            }
         }
 
     def get_all(self):
