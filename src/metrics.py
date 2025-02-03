@@ -7,6 +7,16 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Metrics:
+    class Metadata:
+        def __init__(self, filename=None):
+            self.filename = filename
+            self.datetime = datetime.now()
+
+        def to_dict(self):
+            return {
+                "filename": self.filename,
+                "datetime": self.datetime
+            }
     class Hyperparameters:
         def __init__(self, learning_rate=0.01, number_of_hidden_layers=1, batch_size=32, number_of_epochs=10,
                      regularisation_techniques=None):
@@ -49,9 +59,6 @@ class Metrics:
             self.prediction = prediction
             self.visualising_predictions = visualising_predictions
             self.training_time = training_time
-            self.total_splits = total_splits
-            self.total_nodes = total_nodes
-            self.total_leaves = total_leaves
 
         def to_dict(self):
             """
@@ -109,17 +116,37 @@ class Metrics:
                 "total_nodes": self.total_nodes,
                 "total_leaves": self.total_leaves,
             }
+
+    class Accountant:
+        def __init__(self):
+            self.number_of_parameters = 0
+            self.number_of_units_in_each_layer = []
+            self.activation_functions = []
+            self.vc_dimension = 0
+            self.rademacher_complexity = 0.0
+            self.bayesian_information_criterion = 0.0
+            self.x_train_shape = 0.0
+            self.y_train_shape = 0.0
+            self.max_depth = 0
+            self.number_of_trees_in_forest = 0  # up == complexity
+
+        def to_dict(self):
+            return {
+                "number_of_parameters": self.filename,
+                "number_of_units_in_each_layer": self.datetime,
+                "activation_functions": self.activation_functions,
+                "vc_dimension": self.vc_dimension,
+                "rademacher_complexity":  self.rademacher_complexity,
+                "bayesian_information_criterion":self.bayesian_information_criterion,
+                "x_train_shape": self.x_train_shape,
+                "y_train_shape": self.y_train_shape,
+                "max_depth": self.max_depth,
+                "number_of_trees_in_forest": self.number_of_trees_in_forest
+            }
     def __init__(self):
-        self.number_of_parameters = 0
-        self.number_of_units_in_each_layer = []
-        self.activation_functions = []
-        self.vc_dimension = 0
-        self.rademacher_complexity = 0.0
-        self.bayesian_information_criterion = 0.0
-        self.x_train_shape = 0.0
-        self.y_train_shape = 0.0
-        self.max_depth = 0
-        self.number_of_trees_in_forest = 0 # up == complexity
+        self.timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        self.Metadata = self.Metadata(self.timestamp)
+        self.Accountant = self.Accountant()
         self.statistics = self.Statistics()
         self.timings = self.Timings()
         self.hyperparameters = self.Hyperparameters()
@@ -150,7 +177,7 @@ class Metrics:
         os.makedirs(results_dir, exist_ok=True)
 
         # Create a timestamped file name
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        timestamp = self.timestamp
         file_path = os.path.join(results_dir, f"{timestamp}.json")
 
         # Check for existing file and avoid overwriting
