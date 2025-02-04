@@ -72,6 +72,10 @@ def main():
         max_depth = 5
         metric_object.max_depth = max_depth
         model = NeuralNetworkModel(input_shape=input_shape, n_estimators=metric_object.number_of_trees_in_forest, max_depth=max_depth)
+
+        # Flatten y_train to make sure it's 1D
+        y_train = y_train.ravel()  # or use y_train.flatten()
+
         # Train the model on the training data
         logging.info("   Training the model...")
         train_metrics = model.train(X_train, y_train)
