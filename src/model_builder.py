@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
@@ -26,7 +27,7 @@ class NeuralNetworkModel:
             model (RandomForestRegressor): Compiled machine learning model.
         """
         model = RandomForestRegressor(n_estimators=self.n_estimators, max_depth=self.max_depth, random_state=42)
-        print("Model architecture successfully built.")
+        logging.info(f"   Model architecture successfully built.")
         return model
 
     def get_model_structure_metrics(self):
@@ -155,7 +156,7 @@ if __name__ == "__main__":
 
     # Simulate data (for example purposes)
     X_train = np.random.rand(100, *input_shape)
-    y_train = np.random.rand(100, 1).flatten()
+    y_train = np.random.rand(100, 1).ravel()
     X_test = np.random.rand(20, *input_shape)
     y_test = np.random.rand(20, 1).flatten()
 

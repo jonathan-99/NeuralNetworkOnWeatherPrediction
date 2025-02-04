@@ -73,7 +73,7 @@ def main():
         metric_object.max_depth = max_depth
         model = NeuralNetworkModel(input_shape=input_shape, n_estimators=metric_object.number_of_trees_in_forest, max_depth=max_depth)
         # Train the model on the training data
-        logging.info("Training the model...")
+        logging.info("   Training the model...")
         train_metrics = model.train(X_train, y_train)
         # Store additional metrics in the Metrics object
         model_object = model.get_model_structure_metrics()
@@ -81,7 +81,7 @@ def main():
         metric_object.statistics.total_nodes = model_object['total_nodes']
         metric_object.statistics.total_leaves = model_object['total_leaves']
         metric_object.training_mse = train_metrics['mse']
-        logging.info("Model training completed.")
+        logging.info("   Model training completed.")
 
         # Call get_advanced_metrics to capture additional model insights
         advanced_metrics = model.get_advanced_metrics(X_train, y_train)

@@ -62,11 +62,11 @@ class WindSpeedData:
         Processes a single line of data, extracting and validating the timestamp and wind speed.
         """
         try:
-            logging.info(f"Processing line: {line.strip()}")  # Log raw line input
+            logging.debug(f"Processing line: {line.strip()}")  # Log raw line input
 
             # Split the line by comma and remove empty trailing parts
             parts = [x.strip() for x in line.strip().split(',') if x.strip()]
-            logging.info(f"Extracted parts: {parts}")  # Log extracted values
+            logging.debug(f"Extracted parts: {parts}")  # Log extracted values
 
             # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
             if len(parts) != 2:
@@ -74,13 +74,13 @@ class WindSpeedData:
                 return
 
             timestamp_str, wind_speed_str = parts
-            logging.info(f"Parsed timestamp string: {timestamp_str}, Wind speed string: {wind_speed_str}")
+            logging.debug(f"Parsed timestamp string: {timestamp_str}, Wind speed string: {wind_speed_str}")
 
             # Parse the timestamp and wind speed
             try:
                 timestamp = datetime.strptime(timestamp_str.strip(), '%Y %m %d %H')
                 wind_speed = float(wind_speed_str.strip())
-                logging.info(f"Converted timestamp: {timestamp}, Wind speed: {wind_speed}")
+                logging.debug(f"Converted timestamp: {timestamp}, Wind speed: {wind_speed}")
             except ValueError as ve:
                 logging.error(f"   Skipping invalid data due to value error: {line.strip()} - {ve}")
                 return
@@ -94,7 +94,7 @@ class WindSpeedData:
             timestamps.append(timestamp)
             wind_speeds.append(wind_speed)
             seen_timestamps.add(timestamp)
-            logging.info(f"Added data - Timestamp: {timestamp}, Wind Speed: {wind_speed}")
+            logging.debug(f"Added data - Timestamp: {timestamp}, Wind Speed: {wind_speed}")
 
         except Exception as e:
             logging.error(f"   Skipping invalid data due to unexpected error: {line.strip()} - {e}")
