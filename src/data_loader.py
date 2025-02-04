@@ -34,9 +34,9 @@ class WindSpeedData:
                 self._process_file(file_path, timestamps, wind_speeds, seen_timestamps)
 
             if not timestamps or not wind_speeds:
-                logging.error("Loaded data is empty. Please check the file contents.")
+                logging.error("   Loaded data is empty. Please check the file contents.")
             else:
-                logging.info(f"Data loaded successfully from {len(self.file_paths)} file(s).")
+                logging.info(f"   Data loaded successfully from {len(self.file_paths)} file(s).")
 
         except FileNotFoundError:
             logging.error(f"Error: One or more files were not found: {self.file_paths}")
@@ -55,58 +55,71 @@ class WindSpeedData:
             wind_speeds (list): The list to append wind speed data.
             seen_timestamps (set): The set to track unique timestamps.
         """
-        logging.info(f"Reading data from {file_path}...")
+        logging.info(f"  Reading data from {file_path}...")
         try:
             with open(file_path, 'r') as file:
                 for line in file:
                     # Ignore empty lines and process only valid lines
                     if line.strip():
                         self._process_line(line, timestamps, wind_speeds, seen_timestamps)
+        except FileNotFoundError:
+            logging.error(f"  File not found: {file_path}")
+        except PermissionError:
+            logging.error(f"  Permission denied: {file_path}")
         except Exception as e:
-            logging.error(f"Error processing file {file_path}: {e}")
+            logging.error(f"  Unexpected error reading {file_path}: {e}")
 
-    def _process_line(self, line, timestamps, wind_speeds, seen_timestamps):
-        """
-        Processes a single line of data, extracting and validating the timestamp and wind speed.
 
-        Args:
-            line (str): The line of text to process.
-            timestamps (list): The list to append timestamps.
-            wind_speeds (list): The list to append wind speed data.
-            seen_timestamps (set): The set to track unique timestamps.
-        """
+def _process_line(self, line, timestamps, wind_speeds, seen_timestamps):
+    """
+    Processes a single line of data, extracting and validating the timestamp and wind speed.
+
+    Args:
+        line (str): The line of text to process.
+        timestamps (list): The list to append timestamps.
+        wind_speeds (list): The list to append wind speed data.
+        seen_timestamps (set): The set to track unique timestamps.
+    """
+    try:
+        logging.info(f"Processing line: {line.strip()}")  # Log raw line input
+
+        # Split the line by comma and remove empty trailing parts
+        parts = [x.strip() for x in line.strip().split(',') if x.strip()]
+        logging.info(f"Extracted parts: {parts}")  # Log extracted values
+
+        # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
+        if len(parts) != 2:
+            logging.warning(f"   Skipping invalid data (wrong number of values): {line.strip()}")
+            return
+
+        timestamp_str, wind_speed_str = parts
+        logging.info(f"Parsed timestamp string: {timestamp_str}, Wind speed string: {wind_speed_str}")
+
+        # Parse the timestamp and wind speed
         try:
-            # Split the line by comma and remove empty trailing parts
-            parts = [x.strip() for x in line.strip().split(',') if x.strip()]
+            timestamp = datetime.strptime(timestamp_str.strip(), '%Y %m %d %H')
+            wind_speed = float(wind_speed_str.strip())
+            logging.info(f"Converted timestamp: {timestamp}, Wind speed: {wind_speed}")
+        except ValueError as ve:
+            logging.error(f"   Skipping invalid data due to value error: {line.strip()} - {ve}")
+            return
 
-            # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
-            if len(parts) != 2:
-                logging.warning(f"Skipping invalid data (wrong number of values): {line.strip()}")
-                return
+        # Check for duplicate empty rows (timestamps with 0.0)
+        if timestamp in seen_timestamps and wind_speed == 0.0:
+            logging.warning(f"   Ignoring duplicate empty row for {timestamp}")
+            return
 
-            timestamp_str, wind_speed_str = parts
-            # Parse the timestamp and wind speed
-            try:
-                timestamp = datetime.strptime(timestamp_str.strip(), '%Y %m %d %H')
-                wind_speed = float(wind_speed_str.strip())
-            except ValueError as ve:
-                logging.error(f"Skipping invalid data due to value error: {line.strip()} - {ve}")
-                return
+        # Append parsed data to lists
+        timestamps.append(timestamp)
+        wind_speeds.append(wind_speed)
+        seen_timestamps.add(timestamp)
+        logging.info(f"Added data - Timestamp: {timestamp}, Wind Speed: {wind_speed}")
 
-            # Check for duplicate empty rows (timestamps with 0.0)
-            if timestamp in seen_timestamps and wind_speed == 0.0:
-                logging.warning(f"Ignoring duplicate empty row for {timestamp}")
-                return
+    except Exception as e:
+        logging.error(f"   Skipping invalid data due to unexpected error: {line.strip()} - {e}")
 
-            # Append parsed data to lists
-            timestamps.append(timestamp)
-            wind_speeds.append(wind_speed)
-            seen_timestamps.add(timestamp)
 
-        except Exception as e:
-            logging.error(f"Skipping invalid data 3: {line.strip()} - {e}")
-
-    def get_data(self):
+def get_data(self):
         """
         Method to return the loaded timestamps and wind speed data.
 

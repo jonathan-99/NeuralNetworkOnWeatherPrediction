@@ -29,9 +29,9 @@ def main():
         metric_object.timings.loading_data = finish - start
 
         if not timestamps or not wind_speeds:
-            logging.error("Data loading failed. No data found.")
+            logging.error("   Data loading failed. No data found.")
             return
-        logging.info(f"Loaded data with {len(timestamps)} records.")
+        logging.info(f"   Loaded data with {len(timestamps)} records.")
 
         # Step 2: Preprocess the data
         start = datetime.datetime.now()
