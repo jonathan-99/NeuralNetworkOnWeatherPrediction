@@ -8,9 +8,6 @@ class WindSpeedData:
     def __init__(self, file_paths):
         """
         Initialize the WindSpeedData object by loading data from one or multiple text files.
-
-        Args:
-            file_paths (str or list): Path(s) to the text file(s) containing wind speed data.
         """
         if isinstance(file_paths, str):
             file_paths = [file_paths]  # Convert a single file path to a list
@@ -21,9 +18,6 @@ class WindSpeedData:
     def _load_data(self):
         """
         Private method to read wind speed data from the file(s) and store it with timestamps.
-
-        Returns:
-            tuple: Two lists - timestamps (datetime objects) and wind speed values (floats).
         """
         timestamps = []
         wind_speeds = []
@@ -48,12 +42,6 @@ class WindSpeedData:
     def _process_file(self, file_path, timestamps, wind_speeds, seen_timestamps):
         """
         Processes a single file to extract and validate wind speed data.
-
-        Args:
-            file_path (str): The path of the file to read.
-            timestamps (list): The list to append timestamps.
-            wind_speeds (list): The list to append wind speed data.
-            seen_timestamps (set): The set to track unique timestamps.
         """
         logging.info(f"  Reading data from {file_path}...")
         try:
@@ -69,62 +57,51 @@ class WindSpeedData:
         except Exception as e:
             logging.error(f"  Unexpected error reading {file_path}: {e}")
 
-
-def _process_line(self, line, timestamps, wind_speeds, seen_timestamps):
-    """
-    Processes a single line of data, extracting and validating the timestamp and wind speed.
-
-    Args:
-        line (str): The line of text to process.
-        timestamps (list): The list to append timestamps.
-        wind_speeds (list): The list to append wind speed data.
-        seen_timestamps (set): The set to track unique timestamps.
-    """
-    try:
-        logging.info(f"Processing line: {line.strip()}")  # Log raw line input
-
-        # Split the line by comma and remove empty trailing parts
-        parts = [x.strip() for x in line.strip().split(',') if x.strip()]
-        logging.info(f"Extracted parts: {parts}")  # Log extracted values
-
-        # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
-        if len(parts) != 2:
-            logging.warning(f"   Skipping invalid data (wrong number of values): {line.strip()}")
-            return
-
-        timestamp_str, wind_speed_str = parts
-        logging.info(f"Parsed timestamp string: {timestamp_str}, Wind speed string: {wind_speed_str}")
-
-        # Parse the timestamp and wind speed
+    def _process_line(self, line, timestamps, wind_speeds, seen_timestamps):
+        """
+        Processes a single line of data, extracting and validating the timestamp and wind speed.
+        """
         try:
-            timestamp = datetime.strptime(timestamp_str.strip(), '%Y %m %d %H')
-            wind_speed = float(wind_speed_str.strip())
-            logging.info(f"Converted timestamp: {timestamp}, Wind speed: {wind_speed}")
-        except ValueError as ve:
-            logging.error(f"   Skipping invalid data due to value error: {line.strip()} - {ve}")
-            return
+            logging.info(f"Processing line: {line.strip()}")  # Log raw line input
 
-        # Check for duplicate empty rows (timestamps with 0.0)
-        if timestamp in seen_timestamps and wind_speed == 0.0:
-            logging.warning(f"   Ignoring duplicate empty row for {timestamp}")
-            return
+            # Split the line by comma and remove empty trailing parts
+            parts = [x.strip() for x in line.strip().split(',') if x.strip()]
+            logging.info(f"Extracted parts: {parts}")  # Log extracted values
 
-        # Append parsed data to lists
-        timestamps.append(timestamp)
-        wind_speeds.append(wind_speed)
-        seen_timestamps.add(timestamp)
-        logging.info(f"Added data - Timestamp: {timestamp}, Wind Speed: {wind_speed}")
+            # Ensure the line splits into exactly 2 valid values (timestamp and wind speed)
+            if len(parts) != 2:
+                logging.warning(f"   Skipping invalid data (wrong number of values): {line.strip()}")
+                return
 
-    except Exception as e:
-        logging.error(f"   Skipping invalid data due to unexpected error: {line.strip()} - {e}")
+            timestamp_str, wind_speed_str = parts
+            logging.info(f"Parsed timestamp string: {timestamp_str}, Wind speed string: {wind_speed_str}")
 
+            # Parse the timestamp and wind speed
+            try:
+                timestamp = datetime.strptime(timestamp_str.strip(), '%Y %m %d %H')
+                wind_speed = float(wind_speed_str.strip())
+                logging.info(f"Converted timestamp: {timestamp}, Wind speed: {wind_speed}")
+            except ValueError as ve:
+                logging.error(f"   Skipping invalid data due to value error: {line.strip()} - {ve}")
+                return
 
-def get_data(self):
+            # Check for duplicate empty rows (timestamps with 0.0)
+            if timestamp in seen_timestamps and wind_speed == 0.0:
+                logging.warning(f"   Ignoring duplicate empty row for {timestamp}")
+                return
+
+            # Append parsed data to lists
+            timestamps.append(timestamp)
+            wind_speeds.append(wind_speed)
+            seen_timestamps.add(timestamp)
+            logging.info(f"Added data - Timestamp: {timestamp}, Wind Speed: {wind_speed}")
+
+        except Exception as e:
+            logging.error(f"   Skipping invalid data due to unexpected error: {line.strip()} - {e}")
+
+    def get_data(self):
         """
         Method to return the loaded timestamps and wind speed data.
-
-        Returns:
-            tuple: Two lists - timestamps and wind speed values.
         """
         return self.timestamps, self.wind_speeds
 
