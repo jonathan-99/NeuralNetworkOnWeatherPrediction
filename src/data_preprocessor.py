@@ -27,15 +27,15 @@ class DataPreprocessor:
         """
         Scale the wind speed data using Min-Max normalization.
         """
-        logging.info(f"Original shape of wind_speeds: {self.wind_speeds.shape}")
+        logging.info(f"   Original shape of wind_speeds: {self.wind_speeds.shape}")
 
         # Scale the data using Min-Max scaling
         self.wind_speeds = self.scaler.fit_transform(self.wind_speeds)
 
         # Log the min and max values of the scaled data
-        logging.info(f"Data scaled with initial min: {np.min(self.wind_speeds)}, max: {np.max(self.wind_speeds)}.")
+        logging.info(f"   Data scaled with initial min: {np.min(self.wind_speeds)}, max: {np.max(self.wind_speeds)}.")
 
-        logging.info(f"Scaled data shape: {self.wind_speeds.shape}")
+        logging.info(f"   Scaled data shape: {self.wind_speeds.shape}")
 
         return self.wind_speeds
 
@@ -47,7 +47,7 @@ class DataPreprocessor:
             logging.error("Error: Cannot split empty data.")
             raise ValueError("No data available for splitting.")
 
-        logging.info("Splitting data into training, validation, and test sets...")
+        logging.info("   Splitting data into training, validation, and test sets...")
 
         # First split into training+validation and test sets
         train_val_data, test_data = train_test_split(
@@ -62,7 +62,7 @@ class DataPreprocessor:
         val_size_adjusted = val_size / (1 - test_size)
 
         # Log the adjusted validation size
-        logging.info(f"Adjusted validation size: {val_size_adjusted:.4f} (calculated based on test_size={test_size})")
+        logging.info(f"   Adjusted validation size: {val_size_adjusted:.4f} (calculated based on test_size={test_size})")
 
         # Now split the training+validation set into separate train and validation sets
         train_data, val_data = train_test_split(
@@ -80,10 +80,10 @@ class DataPreprocessor:
         y_test = test_data  # Test target
 
         # Enhanced logging to show the shape of each dataset
-        logging.info(f"Data split completed:")
-        logging.info(f"  Train set: Size = {len(X_train)}, Shape = {X_train.shape}, y_train shape = {y_train.shape}")
-        logging.info(f"  Validation set: Size = {len(X_val)}, Shape = {X_val.shape}, y_val shape = {y_val.shape}")
-        logging.info(f"  Test set: Size = {len(X_test)}, Shape = {X_test.shape}, y_test shape = {y_test.shape}")
+        logging.info(f"   Data split completed:")
+        logging.info(f"   Train set: Size = {len(X_train)}, Shape = {X_train.shape}, y_train shape = {y_train.shape}")
+        logging.info(f"   Validation set: Size = {len(X_val)}, Shape = {X_val.shape}, y_val shape = {y_val.shape}")
+        logging.info(f"   Test set: Size = {len(X_test)}, Shape = {X_test.shape}, y_test shape = {y_test.shape}")
 
         return X_train, X_val, X_test, y_train, y_val, y_test
 
@@ -91,6 +91,6 @@ class DataPreprocessor:
         """
         Inversely transform scaled data back to original scale.
         """
-        logging.info(f"Inversely transforming data of shape {data.shape}.")
+        logging.info(f"   Inversely transforming data of shape {data.shape}.")
 
         return self.scaler.inverse_transform(data)

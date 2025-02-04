@@ -88,15 +88,17 @@ class NeuralNetworkModel:
         """
         Print basic model information and structure metrics.
         """
-        print(f"RandomForestRegressor Model with {self.n_estimators} estimators and max depth {self.max_depth}")
+        text = f"   RandomForestRegressor Model with {self.n_estimators} estimators and max depth {self.max_depth}"
+        logging.info(text)
+        print(text)
         if hasattr(self.model, "estimators_"):
             metrics = self.get_model_structure_metrics()
-            print("Model Structure Metrics:")
+            print("   Model Structure Metrics:")
             print(f"  Total Nodes: {metrics['total_nodes']}")
             print(f"  Total Leaves: {metrics['total_leaves']}")
             print(f"  Total Splits: {metrics['total_splits']}")
         else:
-            print("Model structure metrics are not available until the model is trained.")
+            print("   Model structure metrics are not available until the model is trained.")
 
     def train(self, X_train, y_train):
         """
@@ -112,7 +114,7 @@ class NeuralNetworkModel:
         self.model.fit(X_train, y_train)
         predictions = self.model.predict(X_train)
         mse = mean_squared_error(y_train, predictions)
-        print(f"Training complete. Mean Squared Error on training data: {mse}")
+        logging.info(f"   Training complete. Mean Squared Error on training data: {mse}")
         return {'mse': mse}
 
     def fit(self, X_train, y_train):
@@ -134,7 +136,7 @@ class NeuralNetworkModel:
         """
         predictions = self.model.predict(X_test)
         mse = mean_squared_error(y_test, predictions)
-        print(f"Test Mean Squared Error: {mse}")
+        print(f"   Test Mean Squared Error: {mse}")
         return mse
 
     def predict(self, X):

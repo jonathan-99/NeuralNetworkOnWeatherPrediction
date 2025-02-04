@@ -26,7 +26,7 @@ class ModelTrainer:
         # Ensure the output directory exists
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-            logging.info(f"Created output directory at {self.output_dir}")
+            logging.info(f"   Created output directory at {self.output_dir}")
 
         self.checkpoint_path = os.path.join(self.output_dir, 'best_model.pkl')
 
@@ -43,8 +43,8 @@ class ModelTrainer:
         """
         # Split the data into training and validation sets
         X_train, X_val, y_train, y_val = train_test_split(data, target, test_size=self.test_size, random_state=42)
-        logging.info("Starting model training...")
-        logging.info(f"Training data size: {X_train.shape[0]} samples, Validation data size: {X_val.shape[0]} samples")
+        logging.info("   Starting model training...")
+        logging.info(f"  Training data size: {X_train.shape[0]} samples, Validation data size: {X_val.shape[0]} samples")
 
         best_mse = float('inf')
         history = {}
@@ -57,20 +57,20 @@ class ModelTrainer:
 
             # Train the model using the training data
             self.model.fit(X_train, y_train)
-            logging.info("Model training completed successfully.")
+            logging.info("   Model training completed successfully.")
 
             # Evaluate on validation data
             val_predictions = self.model.predict(X_val)
             val_mse = mean_squared_error(y_val, val_predictions)
-            logging.info(f"Validation Mean Squared Error (MSE): {val_mse:.4f}")
+            logging.info(f"   Validation Mean Squared Error (MSE): {val_mse:.4f}")
 
             # Save the model if it's the best performing one
             if val_mse < best_mse:
                 best_mse = val_mse
                 joblib.dump(self.model, self.checkpoint_path)
-                logging.info(f"Best model saved with MSE: {best_mse:.4f} at {self.checkpoint_path}")
+                logging.info(f"   Best model saved with MSE: {best_mse:.4f} at {self.checkpoint_path}")
             else:
-                logging.info(f"Model with MSE: {val_mse:.4f} did not improve the best MSE: {best_mse:.4f}")
+                logging.info(f"   Model with MSE: {val_mse:.4f} did not improve the best MSE: {best_mse:.4f}")
 
             # Add detailed information to the history dictionary
             history['val_mse'] = val_mse
@@ -78,7 +78,7 @@ class ModelTrainer:
             history['train_samples'] = X_train.shape[0]
             history['val_samples'] = X_val.shape[0]
 
-            logging.info("Training history:")
+            logging.info("   Training history:")
             for key, value in history.items():
                 logging.info(f"{key}: {value}")
 
@@ -94,6 +94,6 @@ class ModelTrainer:
         """
         if os.path.exists(self.checkpoint_path):
             self.model = joblib.load(self.checkpoint_path)
-            logging.info(f"Best model loaded from {self.checkpoint_path}")
+            logging.info(f"   Best model loaded from {self.checkpoint_path}")
         else:
             logging.error("Best model file not found.")

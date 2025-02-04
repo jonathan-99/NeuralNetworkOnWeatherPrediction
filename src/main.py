@@ -44,10 +44,10 @@ def main():
         # Get the data split into train, validation, and test sets
         X_train, X_val, X_test, y_train, y_val, y_test = preprocessor.split_data()
 
-        logging.info(f"Data split completed: "
-                     f"Training set size: {X_train.shape[0]}, "
-                     f"Validation set size: {X_val.shape[0]}, "
-                     f"Test set size: {X_test.shape[0]}")
+        logging.info(f"   Data split completed: "
+                     f"   Training set size: {X_train.shape[0]}, "
+                     f"   Validation set size: {X_val.shape[0]}, "
+                     f"   Test set size: {X_test.shape[0]}")
 
         if X_train.size == 0 or X_val.size == 0 or X_test.size == 0:
             logging.error("Data splitting resulted in an empty set. Check the input data and split parameters.")
@@ -93,24 +93,24 @@ def main():
         metric_object.statistics.rademacher_complexity = advanced_metrics['rademacher_complexity']
         metric_object.statistics.bayesian_information_criterion = advanced_metrics['bayesian_information_criterion']
 
-        logging.info(f"Advanced Metrics: VC Dimension={advanced_metrics['vc_dimension']}, "
-                     f"Rademacher Complexity={advanced_metrics['rademacher_complexity']}, "
-                     f"BIC={advanced_metrics['bayesian_information_criterion']}")
+        logging.info(f"   Advanced Metrics: VC Dimension={advanced_metrics['vc_dimension']}, "
+                     f"   Rademacher Complexity={advanced_metrics['rademacher_complexity']}, "
+                     f"   BIC={advanced_metrics['bayesian_information_criterion']}")
 
         finish = datetime.datetime.now()
         metric_object.timings.building = finish - start
 
         # Step 5: Train the model
         start = datetime.datetime.now()
-        logging.info("Training model...")
+        logging.info("Step 5: Training model...")
         metric_object.x_train_shape = X_train.shape
         metric_object.y_train_shape = y_train.shape
         trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
         training_output = trainer.train(X_train, y_train)
-        logging.info(f'Training history - {training_output}')
+        logging.info(f'   Training history - {training_output}')
         metric_object.statistics.validation_mse = training_output['val_mse']
         metric_object.statistics.best_mse = training_output['best_mse']
-        logging.info("Model training completed.")
+        logging.info("   Model training completed.")
         finish = datetime.datetime.now()
         metric_object.timings.training_time = finish - start
 
