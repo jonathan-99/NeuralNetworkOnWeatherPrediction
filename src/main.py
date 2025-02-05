@@ -7,7 +7,7 @@ from src.data_visualizer import DataVisualizer
 from src.model_trainer import ModelTrainer
 from src.model_evaluator import ModelEvaluator
 from src.visualise_predictions import plot_predictions
-from src.model_builder import NeuralNetworkModel
+from src.model_builder import ForestModel
 from src.metrics import Metrics
 import datetime
 
@@ -71,24 +71,29 @@ def main():
         metric_object.number_of_trees_in_forest = 100
         max_depth = 5
         metric_object.max_depth = max_depth
-        model = NeuralNetworkModel(input_shape=input_shape, n_estimators=metric_object.number_of_trees_in_forest, max_depth=max_depth)
+        forest_model = ForestModel(input_shape=input_shape, n_estimators=metric_object.number_of_trees_in_forest, max_depth=max_depth)
 
         # Flatten y_train to make sure it's 1D
         y_train = y_train.ravel()  # or use y_train.flatten()
 
         # Train the model on the training data
-        logging.info("   Training the model...")
-        train_metrics = model.train(X_train, y_train)
-        # Store additional metrics in the Metrics object
-        model_object = model.get_model_structure_metrics()
-        metric_object.statistics.total_splits = model_object['total_splits']
-        metric_object.statistics.total_nodes = model_object['total_nodes']
-        metric_object.statistics.total_leaves = model_object['total_leaves']
+        logging.info("   Why we Training the model in this...")
+        train_metrics = forest_model.train(X_train, y_train)
+
+        temp = forest_model.get_model_structure_metrics()
+        metric_object.add_model(Metrics.ForestModel())
+        metric_object.ForestModel.vc_dimension = temp["vc_dimension"]
+        metric_object.ForestModel.vc_dimension = temp["rademacher_complexity"]
+        metric_object.ForestModel.vc_dimension = temp["bayesian_information_criterion"]
+        logging.info(f"   *Model structure metrics: {forest_model}")
+        metric_object.statistics.total_splits = forest_model['total_splits']
+        metric_object.statistics.total_nodes = forest_model['total_nodes']
+        metric_object.statistics.total_leaves = forest_model['total_leaves']
         metric_object.training_mse = train_metrics['mse']
-        logging.info("   Model training completed.")
+        logging.info("   Forest Model training completed.")
 
         # Call get_advanced_metrics to capture additional model insights
-        advanced_metrics = model.get_advanced_metrics(X_train, y_train)
+        advanced_metrics = forest_model.get_advanced_metrics(X_train, y_train)
         metric_object.statistics.vc_dimension = advanced_metrics['vc_dimension']
         metric_object.statistics.rademacher_complexity = advanced_metrics['rademacher_complexity']
         metric_object.statistics.bayesian_information_criterion = advanced_metrics['bayesian_information_criterion']
@@ -105,7 +110,7 @@ def main():
         logging.info("Step 5: Training model...")
         metric_object.x_train_shape = X_train.shape
         metric_object.y_train_shape = y_train.shape
-        trainer = ModelTrainer(model)  # Initialize ModelTrainer with the model
+        trainer = ModelTrainer(forest_model)  # Initialize ModelTrainer with the model
         training_output = trainer.train(X_train, y_train)
         logging.info(f'   Training history - {training_output}')
         metric_object.statistics.validation_mse = training_output['val_mse']
@@ -117,38 +122,38 @@ def main():
         # Step 6: Evaluate the model
         start = datetime.datetime.now()
         logging.info("Step 6: Evaluating the model...")
-        evaluator = ModelEvaluator(model)
+        evaluator = ModelEvaluator(forest_model)
         metrics = evaluator.evaluate(X_test, y_test)
         metric_object.mse = metrics['mse']
         metric_object.rmse_value = metrics['rmse']
         metric_object.mae_value = metrics['mae']
         finish = datetime.datetime.now()
         metric_object.timings.evaluating = finish - start
-        logging.info(f"Evaluation metrics: {metrics}")
+        logging.info(f"   Evaluation metrics: {metrics}")
 
         # Generate predictions for visualization
         start = datetime.datetime.now()
-        logging.info("Generating predictions for the test set...")
-        predictions = model.predict(X_test)
+        logging.info("    Generating predictions for the test set...")
+        predictions = forest_model.predict(X_test)
         finish = datetime.datetime.now()
         metric_object.timings.prediction = finish - start
-        logging.info("Predictions generated.")
+        logging.info("   Predictions generated.")
 
         # Visualize the predictions
         start = datetime.datetime.now()
         evaluator.plot_predictions(y_test, predictions)
         finish = datetime.datetime.now()
         metric_object.timings.visualising_predictions = finish - start
-        logging.info("Model evaluation and visualization completed.")
+        logging.info("   Model evaluation and visualization completed.")
 
         # Step 7: Visualize predictions
         logging.info("Step 7: Visualizing final predictions...")
         start = datetime.datetime.now()
-        plot_predictions(model, X_test, y_test)
+        plot_predictions(forest_model, X_test, y_test)
         finish = datetime.datetime.now()
         metric_object.timings.visualising = finish - start
 
-        logging.info("Pipeline completed successfully.")
+        logging.info("   Pipeline completed successfully.")
         metric_object.save_metric_to_file()
     except Exception as e:
         logging.error(f"An unexpected error occurred during execution: {e}")

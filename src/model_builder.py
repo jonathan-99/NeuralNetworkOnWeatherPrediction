@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
 
-class NeuralNetworkModel:
+class ForestModel:
     def __init__(self, input_shape, n_estimators=100, max_depth=5):
         """
         Initialize the model with input shape and hyperparameters.
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     y_test = np.random.rand(20, 1).flatten()
 
     # Initialize the model
-    model = NeuralNetworkModel(input_shape=input_shape, n_estimators=100, max_depth=5)
+    model = ForestModel(input_shape=input_shape, n_estimators=100, max_depth=5)
 
     # Train the model
     model.train(X_train, y_train)
