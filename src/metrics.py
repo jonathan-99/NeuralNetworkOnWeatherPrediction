@@ -21,12 +21,14 @@ class Metrics:
 
     class ForestModel:
         def __init__(self):
+            self.number_of_trees_in_forest = 0
             self.vc_dimension = 0
             self.rademacher_complexity = 0
             self.bayesian_information_criterion = 0
 
         def to_dict(self):
             return {
+                "number_of_trees_in_forest": self.number_of_trees_in_forest,
                 "vc_dimension": self.vc_dimension,
                 "rademacher_complexity": self.rademacher_complexity,
                 "bayesian_information_criterion": self.bayesian_information_criterion,
@@ -63,13 +65,19 @@ class Metrics:
         def __init__(self):
             self.loading_data = None
             self.preprocessing = None
-            self.training_time = None
+            self.building_time_forest = None
+            self.building_time_other = None
+            self.training_time_forest = None
+            self.training_time_other = None
 
         def to_dict(self):
             return {
                 "loading_data": str(self.loading_data) if self.loading_data else None,
                 "preprocessing": str(self.preprocessing) if self.preprocessing else None,
-                "training_time": str(self.training_time) if self.training_time else None,
+                "training_time_forest": str(self.building_time_forest) if self.building_time_forest else None,
+                "training_time_other": str(self.building_time_other) if self.building_time_other else None,
+                "training_time_forest": str(self.training_time_forest) if self.training_time_forest else None,
+                "training_time_other": str(self.training_time_other) if self.training_time_other else None,
             }
 
     class Statistics:
